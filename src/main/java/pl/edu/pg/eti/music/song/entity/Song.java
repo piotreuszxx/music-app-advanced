@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 public class Song {
     String title;
-    String genre;
+    Genre genre;
     LocalDate releaseYear;
     double duration; // eg. 2.46
 
