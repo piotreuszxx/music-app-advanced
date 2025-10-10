@@ -1,6 +1,7 @@
 package pl.edu.pg.eti.music.song.entity;
 
 import pl.edu.pg.eti.music.artist.entity.Artist;
+import pl.edu.pg.eti.music.user.entity.User;
 
 import java.time.LocalDate;
 
@@ -11,4 +12,5 @@ public class Song {
     double duration; // eg. 2.46
 
     Artist artist;
+    User user;
 }
