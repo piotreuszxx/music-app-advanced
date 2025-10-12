@@ -1,4 +1,4 @@
-package pl.edu.pg.eti.music.user.entity;
+package music.user.entity;
 
 public enum Role {
     ADMIN, USER;

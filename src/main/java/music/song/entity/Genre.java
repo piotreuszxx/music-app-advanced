@@ -1,4 +1,4 @@
-package pl.edu.pg.eti.music.song.entity;
+package music.song.entity;
 
 public enum Genre {
     HIPHOP,

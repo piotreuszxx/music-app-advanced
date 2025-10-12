@@ -20,7 +20,7 @@
     </properties>
 
     <dependencies>
-        <!-- Pełne API Jakarta EE (Servlet, CDI, JPA, REST itd.) -->
+        <!-- full jakarta api (servlet, jpa, cdi, jsf, etc.) -->
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
@@ -28,7 +28,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Lombok do wygodnego tworzenia klas modelu -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -36,7 +35,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Testy -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
