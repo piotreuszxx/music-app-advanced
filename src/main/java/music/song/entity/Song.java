@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import music.artist.entity.Artist;
 import music.user.entity.User;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
@@ -14,15 +15,15 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString
 @EqualsAndHashCode
-public class Song {
+public class Song implements Serializable {
     private String title;
     private Genre genre;
     private LocalDate releaseYear;
     private double duration; // eg. 2.46
 
-    @ToString.Exclude
+    /*@ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private byte[] cover;
+    private byte[] coverArt;*/
 
 
     private Artist artist;

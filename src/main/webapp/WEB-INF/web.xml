@@ -5,8 +5,13 @@
          version="6.0"
          metadata-complete="false">
 
+    <context-param>
+        <param-name>avatarDir</param-name>
+        <param-value>/avatars</param-value>
+    </context-param>
+
     <listener>
-        <listener-class>music.configuration.listener.CreateDataSource</listener-class>
+        <listener-class>music.configuration.listener.CreateRepositories</listener-class>
     </listener>
 
     <listener>
@@ -15,6 +20,10 @@
 
     <listener>
         <listener-class>music.configuration.listener.CreateControllers</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>music.configuration.listener.InitializedData</listener-class>
     </listener>
 
 </web-app>
