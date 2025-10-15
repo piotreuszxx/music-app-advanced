@@ -7,7 +7,10 @@ import music.user.entity.Role;
 import music.user.entity.User;
 import music.user.service.UserService;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -16,10 +19,14 @@ import java.util.UUID;
 public class InitializedData implements ServletContextListener {
 
     private UserService userService;
+    private Path avatarDir;
 
     @Override
     public void contextInitialized(jakarta.servlet.ServletContextEvent event) {
         userService = (UserService) event.getServletContext().getAttribute("userService");
+        String avatarParam = event.getServletContext().getInitParameter("avatarDir");
+        avatarDir = Path.of(event.getServletContext().getRealPath("/"), avatarParam);
+
         initData();
     }
 
@@ -32,9 +39,9 @@ public class InitializedData implements ServletContextListener {
                 .surname("Admin")
                 .birthday(LocalDate.of(2000, 1, 1))
                 .email("admin@simplerpg.example.com")
-                .password("adminadmin")
+                .password("admin123")
                 .roles(List.of(Role.ADMIN, Role.USER))
-                .avatar(null)
+                .avatar(readAvatar("kacper.png"))
                 .songs(null)
                 .build();
 
@@ -45,9 +52,9 @@ public class InitializedData implements ServletContextListener {
                 .surname("Przymus")
                 .birthday(LocalDate.of(2003, 5, 15))
                 .email("piotreusz@gmail.com")
-                .password("abcd")
+                .password("piotr123")
                 .roles(List.of(Role.USER))
-                .avatar(null)
+                .avatar(readAvatar("piotreusz.png"))
                 .songs(null)
                 .build();
 
@@ -58,26 +65,56 @@ public class InitializedData implements ServletContextListener {
                 .surname("Sengebusch")
                 .birthday(LocalDate.of(2003, 5, 2))
                 .email("nicolele@gmail.com")
-                .password("adminadmin")
+                .password("nicole123")
+                .roles(List.of(Role.USER))
+                .avatar(readAvatar("nicole.png"))
+                .songs(null)
+                .build();
+
+        User ryan = User.builder()
+                .id(UUID.fromString("c4804e0f-769e-4ab9-9ebe-0578fb4faaad"))
+                .login("driver")
+                .name("Ryan")
+                .surname("Gosling")
+                .birthday(LocalDate.of(1980, 5, 2))
+                .email("driver@gmail.com")
+                .password("driver123")
+                .roles(List.of(Role.USER))
+                .avatar(readAvatar("ryan.png"))
+                .songs(null)
+                .build();
+
+        User bezprof = User.builder()
+                .id(UUID.fromString("c4804e0f-769e-4ab9-9ebe-0578fb4faaae"))
+                .login("bezprof")
+                .name("Bez")
+                .surname("Profilowego")
+                .birthday(LocalDate.of(2005, 1, 1))
+                .email("bezprof@gmail.com")
+                .password("bezprof123")
                 .roles(List.of(Role.USER))
                 .avatar(null)
-                //.avatar(getResourceAsByteArray("avatars/rsz_2image.png"))
                 .songs(null)
                 .build();
 
         userService.create(admin);
         userService.create(piotr);
         userService.create(nicole);
+        userService.create(ryan);
+        userService.create(bezprof);
     }
 
-    @SneakyThrows
-    private byte[] getResourceAsByteArray(String name) {
-        try (InputStream is = this.getClass().getResourceAsStream(name)) {
-            if (is != null) {
-                return is.readAllBytes();
+    private byte[] readAvatar(String fileName) {
+        try {
+            Path avatarPath = avatarDir.resolve(fileName);
+            if (Files.exists(avatarPath)) {
+                return Files.readAllBytes(avatarPath);
             } else {
-                throw new IllegalStateException("Unable to get resource %s".formatted(name));
+                System.err.println("[WARN] Avatar file not found: " + avatarPath);
+                return null;
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading avatar " + fileName, e);
         }
     }
 }

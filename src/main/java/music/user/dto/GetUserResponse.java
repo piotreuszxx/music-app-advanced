@@ -16,7 +16,7 @@ public class GetUserResponse {
     private String name;
     private String surname;
     private String email;
-    private byte[] avatar;
+    // private byte[] avatar; // too big
 
     /// should it contain a list of songs?
     /// if yes, then of actual Song objects?

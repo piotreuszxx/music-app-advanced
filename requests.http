@@ -1,0 +1,65 @@
+### GET users
+GET http://localhost:9080/music-app-advanced/api/users
+
+### GET user by id (existing)
+GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaac
+
+### GET user by id (not existing)
+GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000
+
+### PUT create user
+PUT http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
+Content-Type: application/json
+
+{
+"login": "createuser",
+"name": "createname",
+"surname": "createsurname",
+"email": "createuser@gmail.com",
+"password": "createuserpassword"
+}
+
+### GET this new user
+GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
+
+### PATCH update user
+PATCH http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
+Content-Type: application/json
+
+{
+"login": "updatedlogin",
+"name": "updatedname",
+"surname": "updatedsurname",
+"email": "updatedemail@gmail.com",
+"password": "updatedpassword"
+}
+
+### DELETE user
+DELETE http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
+
+
+
+### GET user avatar
+GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar
+
+### GET user avatar (null avatar field)
+GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar
+
+### GET user avatar (not existing user)
+GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000/avatar
+
+### PUT upload user avatar (for one without, when created can be for one with)
+PUT http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="avatar"; filename="new_av.png'
+
+< src/main/resources/avatars/new_av.png
+--boundary--
+
+### GET this user avatar
+GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar
+
+### DELETE user avatar
+DELETE http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar

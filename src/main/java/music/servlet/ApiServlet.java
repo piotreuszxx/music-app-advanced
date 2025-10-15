@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import music.user.controller.UserController;
+import music.user.dto.GetUserResponse;
+import music.user.dto.PatchUserRequest;
+import music.user.dto.PutUserRequest;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -34,26 +37,129 @@ public class ApiServlet extends HttpServlet {
         this.avatarDir = getServletContext().getInitParameter("avatarDir");
     }
 
+    /// for PATCH method support
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (request.getMethod().equals("PATCH")) {
+            doPatch(request, response);
+        } else {
+            super.service(request, response);
+        }
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = parseRequestPath(request);
         String servletPath = request.getServletPath();
+
         if (Paths.API.equals(servletPath)) {
             if (path.matches(Patterns.USERS.pattern())) {
                 response.setContentType("application/json");
                 response.getWriter().write(jsonb.toJson(userController.getUsers()));
                 return;
+
             } else if (path.matches(Patterns.USER.pattern())) {
-                response.setContentType("application/json");
                 UUID uuid = extractUuid(Patterns.USER, path);
-                response.getWriter().write(jsonb.toJson(userController.getUser(uuid)));
+                GetUserResponse user = userController.getUser(uuid);
+                if (user == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+                response.setContentType("application/json");
+                response.getWriter().write(jsonb.toJson(user));
                 return;
+
             } else if (path.matches(Patterns.USER_AVATAR.pattern())) {
-                response.setContentType("image/png");
                 UUID uuid = extractUuid(Patterns.USER_AVATAR, path);
                 byte[] portrait = userController.getUserAvatar(uuid);
+                if (portrait == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+                response.setContentType("image/png");
                 response.setContentLength(portrait.length);
                 response.getOutputStream().write(portrait);
+                return;
+            }
+        }
+
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String path = parseRequestPath(request);
+        String servletPath = request.getServletPath();
+        if (Paths.API.equals(servletPath)) {
+            if (path.matches(Patterns.USER.pattern())) {
+                UUID uuid = extractUuid(Patterns.USER, path);
+
+                boolean created = userController.createUser(jsonb.fromJson(request.getReader(), PutUserRequest.class), uuid);
+                if(created) {
+                    response.setStatus(HttpServletResponse.SC_CREATED);
+                    response.setHeader("Location", request.getRequestURL().toString());
+                } else {
+                    response.sendError(HttpServletResponse.SC_CONFLICT, "User already exists");
+                }
+                return;
+            }
+            else if (path.matches(Patterns.USER_AVATAR.pattern())) {
+                UUID uuid = extractUuid(Patterns.USER_AVATAR, path);
+                boolean updated = userController.putUserAvatar(uuid, request.getPart("avatar").getInputStream());
+                if(updated) {
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                    return;
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+            }
+        }
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String path = parseRequestPath(request);
+        if (path.matches(Patterns.USER.pattern())) {
+            UUID uuid = extractUuid(Patterns.USER, path);
+            boolean updated = userController.updateUserPartial(jsonb.fromJson(request.getReader(), PatchUserRequest.class), uuid);
+            if (updated) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return;
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+        }
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String path = parseRequestPath(request);
+        String servletPath = request.getServletPath();
+        if (Paths.API.equals(servletPath)) {
+            if (path.matches(Patterns.USER.pattern())) {
+                UUID uuid = extractUuid(Patterns.USER, path);
+                if(userController.getUser(uuid) != null) {
+                    userController.deleteUser(uuid);
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                    return;
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+            }
+            else if (path.matches(Patterns.USER_AVATAR.pattern())) {
+                UUID uuid = extractUuid(Patterns.USER_AVATAR, path);
+                boolean deleted = userController.deleteUserAvatar(uuid);
+                if(deleted) {
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                }
                 return;
             }
         }

@@ -14,12 +14,13 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 public class PatchUserRequest {
+    private String login;
     private String name;
     private String surname;
-    private LocalDate birthDate;
     private String email;
-    private byte[] avatar;
+    private String password;
+    // private byte[] avatar;
 
     ///  identify songs by their uuids
-    private List<UUID> songs;
+    // private List<UUID> songs;
 }
