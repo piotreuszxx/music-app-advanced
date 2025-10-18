@@ -7,7 +7,7 @@
 
     <context-param>
         <param-name>avatarDir</param-name>
-        <param-value>../resources/avatars2</param-value>
+        <param-value>avatars</param-value>
     </context-param>
 
     <listener>

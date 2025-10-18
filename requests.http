@@ -37,6 +37,8 @@ Content-Type: application/json
 ### DELETE user
 DELETE http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
 
+### DELETE user
+DELETE http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad
 
 
 ### GET user avatar
@@ -49,7 +51,7 @@ GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0
 GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000/avatar
 
 ### PUT upload user avatar (for one without, when created can be for one with)
-PUT http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar
+PUT http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -59,7 +61,7 @@ Content-Disposition: form-data; name="avatar"; filename="new_av.png'
 --boundary--
 
 ### GET this user avatar
-GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar
+GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar
 
 ### DELETE user avatar
-DELETE http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar
+DELETE http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar

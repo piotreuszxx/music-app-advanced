@@ -94,6 +94,7 @@ public class UserController {
                     try {
                         user.setAvatar(avatarStream.readAllBytes());
                         service.update(user);
+                        Files.write(avatarDir.resolve(user.getId().toString() + ".png"), avatarStream.readAllBytes());
                     } catch (IOException e) {
                         throw new IllegalStateException("Failed to read avatar", e);
                     }
