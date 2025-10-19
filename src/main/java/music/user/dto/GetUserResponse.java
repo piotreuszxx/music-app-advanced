@@ -1,7 +1,7 @@
 package music.user.dto;
 
 import lombok.*;
-import music.song.entity.Song;
+import music.song.dto.GetSongsResponse;
 
 import java.util.List;
 
@@ -18,7 +18,6 @@ public class GetUserResponse {
     private String email;
     // private byte[] avatar; // too big
 
-    /// should it contain a list of songs?
-    /// if yes, then of actual Song objects?
-    private List<Song> songs;
+    /// list of user's songs as small DTOs (id + title)
+    private List<GetSongsResponse.Song> songs;
 }

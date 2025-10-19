@@ -1,0 +1,37 @@
+package music.song.repository;
+
+import music.song.entity.Song;
+
+import java.util.*;
+
+public class SongRepository {
+
+    private final Set<Song> songs = new HashSet<>();
+
+    public Optional<Song> find(UUID id) {
+        return songs.stream()
+                .filter(s -> s.getId().equals(id))
+                .findFirst();
+    }
+
+    public List<Song> findAll() {
+        return new ArrayList<>(songs);
+    }
+
+    public void create(Song song) {
+        if (songs.stream().anyMatch(s -> s.getId().equals(song.getId()))) {
+            throw new IllegalArgumentException("Song with id " + song.getId() + " already exists.");
+            // this shouldnt happen
+        }
+        songs.add(song);
+    }
+
+    public void update(Song song) {
+        songs.removeIf(s -> s.getId().equals(song.getId()));
+        songs.add(song);
+    }
+
+    public void delete(Song song) {
+        songs.removeIf(s -> s.getId().equals(song.getId()));
+    }
+}

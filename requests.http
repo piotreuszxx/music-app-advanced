@@ -2,13 +2,13 @@
 GET http://localhost:9080/music-app-advanced/api/users
 
 ### GET user by id (existing)
-GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaac
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000001
 
 ### GET user by id (not existing)
 GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000
 
 ### PUT create user
-PUT http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
+PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
 Content-Type: application/json
 
 {
@@ -20,10 +20,10 @@ Content-Type: application/json
 }
 
 ### GET this new user
-GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
 
 ### PATCH update user
-PATCH http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
+PATCH http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
 Content-Type: application/json
 
 {
@@ -35,23 +35,20 @@ Content-Type: application/json
 }
 
 ### DELETE user
-DELETE http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000123
-
-### DELETE user
-DELETE http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad
+DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
 
 
 ### GET user avatar
-GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
 
 ### GET user avatar (null avatar field)
-GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaae/avatar
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
 
 ### GET user avatar (not existing user)
 GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000/avatar
 
 ### PUT upload user avatar (for one without, when created can be for one with)
-PUT http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar
+PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -61,7 +58,68 @@ Content-Disposition: form-data; name="avatar"; filename="new_av.png'
 --boundary--
 
 ### GET this user avatar
-GET http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
 
 ### DELETE user avatar
-DELETE http://localhost:9080/music-app-advanced/api/users/c4804e0f-769e-4ab9-9ebe-0578fb4faaad/avatar
+DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
+
+
+### GET artists
+GET http://localhost:9080/music-app-advanced/api/artists
+
+### GET artist by id (example)
+GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001
+
+### PUT create artist
+PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+Content-Type: application/json
+
+{
+	"name": "Ken Carson",
+	"country": "USA",
+	"debutYear": "2000-01-01",
+	"height": 1.8
+}
+
+### PATCH update artist
+PATCH http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+Content-Type: application/json
+
+{
+	"country": "UK"
+}
+
+### DELETE artist
+DELETE http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+
+
+### GET songs
+GET http://localhost:9080/music-app-advanced/api/songs
+
+### GET song by id (example)
+GET http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000001
+
+### PUT create song
+PUT http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
+Content-Type: application/json
+
+{
+	"title": "Money Longer",
+	"genre": "HIPHOP",
+	"releaseYear": "2016-01-01",
+	"duration": 2.5,
+	"artistId": "22222222-2222-2222-2222-000000000001",
+	"userId": "11111111-1111-1111-1111-000000000001"
+}
+
+### PATCH update song
+PATCH http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
+Content-Type: application/json
+
+{
+	"title": "Updated Title",
+    "userId": "11111111-1111-1111-1111-000000000002"
+}
+
+### DELETE song
+DELETE http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009

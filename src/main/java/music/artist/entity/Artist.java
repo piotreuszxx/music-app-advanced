@@ -1,23 +1,31 @@
 package music.artist.entity;
 
 import lombok.*;
-import music.song.entity.Song;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@Builder
 @ToString
 @EqualsAndHashCode
-public class Artist {
+public class Artist implements Serializable {
     private UUID id;
     private String name;
     private String country;
     private LocalDate debutYear;
     private double height;
-    private List<Song> songs;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private List<UUID> songs = new ArrayList<>();
 }

@@ -1,0 +1,60 @@
+package music.artist.controller;
+
+import music.artist.dto.GetArtistsResponse;
+import music.artist.dto.PatchArtistRequest;
+import music.artist.dto.PutArtistRequest;
+import music.artist.entity.Artist;
+import music.artist.service.ArtistService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+public class ArtistController {
+
+    private final ArtistService service;
+
+    public ArtistController(ArtistService service) {
+        this.service = service;
+    }
+
+    public GetArtistsResponse getArtists() {
+        return new GetArtistsResponse(service.findAll().stream()
+                .map(a -> new GetArtistsResponse.Artist(a.getId(), a.getName()))
+                .toList());
+    }
+
+    public Artist getArtist(UUID id) {
+        return service.find(id).orElse(null);
+    }
+
+    public boolean createArtist(PutArtistRequest request, UUID uuid) {
+        if(service.find(uuid).isEmpty()) {
+            Artist artist = Artist.builder()
+                    .id(uuid)
+                    .name(request.getName())
+                    .country(request.getCountry())
+                    .debutYear(request.getDebutYear())
+                    .height(request.getHeight())
+                    .build();
+            service.create(artist);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateArtistPartial(PatchArtistRequest request, UUID uuid) {
+        return service.find(uuid).map(artist -> {
+            if (request.getName() != null) artist.setName(request.getName());
+            if (request.getCountry() != null) artist.setCountry(request.getCountry());
+            if (request.getDebutYear() != null) artist.setDebutYear(request.getDebutYear());
+            if (request.getHeight() != null) artist.setHeight(request.getHeight());
+            service.update(artist);
+            return true;
+        }).orElse(false);
+    }
+
+    public void deleteArtist(UUID uuid) {
+        service.delete(uuid);
+    }
+}

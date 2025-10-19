@@ -6,9 +6,11 @@ import lombok.*;
 @Setter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class PutPasswordRequest {
     private String password;
+
+    ///  class is unused for now
 }

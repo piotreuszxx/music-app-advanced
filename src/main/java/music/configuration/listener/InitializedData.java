@@ -3,15 +3,22 @@ package music.configuration.listener;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import lombok.SneakyThrows;
+import music.song.dto.PutSongRequest;
 import music.user.entity.Role;
 import music.user.entity.User;
 import music.user.service.UserService;
+import music.artist.entity.Artist;
+import music.artist.service.ArtistService;
+import music.song.entity.Song;
+import music.song.entity.Genre;
+import music.song.service.SongService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,11 +26,15 @@ import java.util.UUID;
 public class InitializedData implements ServletContextListener {
 
     private UserService userService;
+    private ArtistService artistService;
+    private SongService songService;
     private Path avatarDir;
 
     @Override
     public void contextInitialized(jakarta.servlet.ServletContextEvent event) {
         userService = (UserService) event.getServletContext().getAttribute("userService");
+        artistService = (ArtistService) event.getServletContext().getAttribute("artistService");
+        songService = (SongService) event.getServletContext().getAttribute("songService");
         String avatarParam = event.getServletContext().getInitParameter("avatarDir");
         avatarDir = Path.of(event.getServletContext().getRealPath("/"), avatarParam);
 
@@ -33,7 +44,7 @@ public class InitializedData implements ServletContextListener {
     @SneakyThrows
     private void initData() {
         User admin = User.builder()
-                .id(UUID.fromString("c4804e0f-769e-4ab9-9ebe-0578fb4faaaa"))
+                .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
                 .login("admin")
                 .name("System")
                 .surname("Admin")
@@ -41,12 +52,11 @@ public class InitializedData implements ServletContextListener {
                 .email("admin@simplerpg.example.com")
                 .password("admin123")
                 .roles(List.of(Role.ADMIN, Role.USER))
-                .avatar(readAvatar("kacper.png"))
-                .songs(null)
+                .avatar(readAvatar("admin.png"))
                 .build();
 
         User piotr = User.builder()
-                .id(UUID.fromString("c4804e0f-769e-4ab9-9ebe-0578fb4faaab"))
+                .id(UUID.fromString("11111111-1111-1111-1111-000000000001"))
                 .login("piotreusz")
                 .name("Piotr")
                 .surname("Przymus")
@@ -55,11 +65,10 @@ public class InitializedData implements ServletContextListener {
                 .password("piotr123")
                 .roles(List.of(Role.USER))
                 .avatar(readAvatar("piotreusz.png"))
-                .songs(null)
                 .build();
 
         User nicole = User.builder()
-                .id(UUID.fromString("c4804e0f-769e-4ab9-9ebe-0578fb4faaac"))
+                .id(UUID.fromString("11111111-1111-1111-1111-000000000002"))
                 .login("nicolele")
                 .name("Nicole")
                 .surname("Sengebusch")
@@ -68,11 +77,10 @@ public class InitializedData implements ServletContextListener {
                 .password("nicole123")
                 .roles(List.of(Role.USER))
                 .avatar(readAvatar("nicole.png"))
-                .songs(null)
                 .build();
 
         User ryan = User.builder()
-                .id(UUID.fromString("c4804e0f-769e-4ab9-9ebe-0578fb4faaad"))
+                .id(UUID.fromString("11111111-1111-1111-1111-000000000003"))
                 .login("driver")
                 .name("Ryan")
                 .surname("Gosling")
@@ -81,11 +89,10 @@ public class InitializedData implements ServletContextListener {
                 .password("driver123")
                 .roles(List.of(Role.USER))
                 .avatar(readAvatar("ryan.png"))
-                .songs(null)
                 .build();
 
         User bezprof = User.builder()
-                .id(UUID.fromString("c4804e0f-769e-4ab9-9ebe-0578fb4faaae"))
+                .id(UUID.fromString("11111111-1111-1111-1111-000000000004"))
                 .login("bezprof")
                 .name("Bez")
                 .surname("Profilowego")
@@ -94,7 +101,6 @@ public class InitializedData implements ServletContextListener {
                 .password("bezprof123")
                 .roles(List.of(Role.USER))
                 .avatar(null)
-                .songs(null)
                 .build();
 
         userService.create(admin);
@@ -102,6 +108,51 @@ public class InitializedData implements ServletContextListener {
         userService.create(nicole);
         userService.create(ryan);
         userService.create(bezprof);
+
+        // initialize artists
+        Artist artist1 = Artist.builder()
+                .id(UUID.fromString("22222222-2222-2222-2222-000000000001"))
+                .name("Lil Uzi Vert")
+                .country("USA")
+                .debutYear(LocalDate.of(1994, 7, 31))
+                .height(1.73)
+                .build();
+
+        Artist artist2 = Artist.builder()
+                .id(UUID.fromString("22222222-2222-2222-2222-000000000002"))
+                .name("The Kid LAROI")
+                .country("Australia")
+                .debutYear(LocalDate.of(2003, 11, 16))
+                .height(1.75)
+                .build();
+
+        artistService.create(artist1);
+        artistService.create(artist2);
+
+        // initialize songs
+        Song song1 = Song.builder()
+                .id(UUID.fromString("33333333-3333-3333-3333-000000000001"))
+                .title("You Was Right")
+                .genre(Genre.HIPHOP)
+                .releaseYear(LocalDate.of(2016, 1, 1))
+                .duration(3.5)
+                .artistUuid(artist1.getId())
+                .userUuid(piotr.getId())
+                .build();
+
+        Song song2 = Song.builder()
+                .id(UUID.fromString("33333333-3333-3333-3333-000000000002"))
+                .title("Stay")
+                .genre(Genre.POP)
+                .releaseYear(LocalDate.of(2021, 1, 1))
+                .duration(2.7)
+                .artistUuid(artist2.getId())
+                .userUuid(nicole.getId())
+                .build();
+
+        // persist songs and also update relations
+        songService.createWithLinks(new PutSongRequest(song1.getTitle(), song1.getGenre(), song1.getReleaseYear(), song1.getDuration(), song1.getArtistUuid(), song1.getUserUuid()), song1.getId());
+        songService.createWithLinks(new PutSongRequest(song2.getTitle(), song2.getGenre(), song2.getReleaseYear(), song2.getDuration(), song2.getArtistUuid(), song2.getUserUuid()), song2.getId());
     }
 
     private byte[] readAvatar(String fileName) {

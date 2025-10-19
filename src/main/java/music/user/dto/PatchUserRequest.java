@@ -21,6 +21,4 @@ public class PatchUserRequest {
     private String password;
     // private byte[] avatar;
 
-    ///  identify songs by their uuids
-    // private List<UUID> songs;
 }

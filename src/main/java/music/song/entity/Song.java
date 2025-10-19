@@ -2,20 +2,21 @@ package music.song.entity;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import music.artist.entity.Artist;
-import music.user.entity.User;
+import java.util.UUID;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class Song implements Serializable {
+    private UUID id;
     private String title;
     private Genre genre;
     private LocalDate releaseYear;
@@ -26,6 +27,6 @@ public class Song implements Serializable {
     private byte[] coverArt;*/
 
 
-    private Artist artist;
-    private User user;
+    private UUID artistUuid;
+    private UUID userUuid;
 }

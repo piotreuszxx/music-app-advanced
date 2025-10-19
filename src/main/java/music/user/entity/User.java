@@ -2,7 +2,8 @@ package music.user.entity;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import music.song.entity.Song;
+import java.util.UUID;
+import java.util.ArrayList;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -36,5 +37,6 @@ public class User implements Serializable {
 
     @ToString.Exclude//It's common to exclude lists from toString
     @EqualsAndHashCode.Exclude
-    private List<Song> songs;
+    @Builder.Default
+    private List<UUID> songs = new ArrayList<>();
 }

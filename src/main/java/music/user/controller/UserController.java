@@ -7,6 +7,8 @@ import music.user.dto.PutUserRequest;
 import music.user.entity.Role;
 import music.user.entity.User;
 import music.user.service.UserService;
+import music.song.service.SongService;
+import music.song.dto.GetSongsResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,22 +21,29 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService service;
+    private final SongService songService;
     private final Path avatarDir;
 
-    public UserController(UserService service, Path avatarDir) {
+    public UserController(UserService service, SongService songService, Path avatarDir) {
         this.service = service;
+        this.songService = songService;
         this.avatarDir = avatarDir;
     }
 
     public GetUserResponse getUser(UUID uuid) {
-        return service.find(uuid)
-                .map(user -> new GetUserResponse(
-                        user.getLogin(),
-                        user.getName(),
-                        user.getSurname(),
-                        user.getEmail(),
-                        user.getSongs()))
-                .orElse(null);
+    return service.find(uuid)
+        .map(user -> new GetUserResponse(
+            user.getLogin(),
+            user.getName(),
+            user.getSurname(),
+            user.getEmail(),
+            user.getSongs().stream()
+                .map(songId -> songService.find(songId)
+                    .map(s -> new GetSongsResponse.Song(s.getId(), s.getTitle()))
+                    .orElse(null))
+                .filter(java.util.Objects::nonNull)
+                .toList()))
+        .orElse(null);
     }
 
     public GetUsersResponse getUsers() {
@@ -56,7 +65,7 @@ public class UserController {
                 .password(request.getPassword())
                 .roles(List.of(Role.USER))
                 .avatar(readAvatar("guest.png"))
-                .songs(null)
+                .songs(new ArrayList<>())
                 .build();
         service.create(newUser);
         return true;
@@ -73,7 +82,7 @@ public class UserController {
                     service.update(user);
                     return true;
                 })
-                .orElse(false); // user nie istnieje → 404
+                .orElse(false); // user does not exist
     }
 
 
