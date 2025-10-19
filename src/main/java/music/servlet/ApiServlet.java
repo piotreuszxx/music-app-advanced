@@ -1,5 +1,6 @@
 package music.servlet;
 
+import jakarta.inject.Inject;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.servlet.ServletException;
@@ -33,19 +34,14 @@ public class ApiServlet extends HttpServlet {
         public static final String API = "/api";
     }
 
+    @Inject
     private UserController userController;
+
+    @Inject
     private ArtistController artistController;
+
+    @Inject
     private SongController songController;
-
-    String avatarDir;
-
-    @Override
-    public void init() {
-        this.userController = (UserController) getServletContext().getAttribute("userController");
-        this.avatarDir = getServletContext().getInitParameter("avatarDir");
-        this.artistController = (ArtistController) getServletContext().getAttribute("artistController");
-        this.songController = (SongController) getServletContext().getAttribute("songController");
-    }
 
     /// for PATCH method support
     @Override

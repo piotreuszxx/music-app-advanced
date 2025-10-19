@@ -39,16 +39,16 @@ DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-111
 
 
 ### GET user avatar
-GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000003/avatar
 
 ### GET user avatar (null avatar field)
-GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
 
 ### GET user avatar (not existing user)
 GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000/avatar
 
 ### PUT upload user avatar (for one without, when created can be for one with)
-PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
+PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -58,10 +58,10 @@ Content-Disposition: form-data; name="avatar"; filename="new_av.png'
 --boundary--
 
 ### GET this user avatar
-GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
+GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
 
 ### DELETE user avatar
-DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000005/avatar
+DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
 
 
 ### GET artists
@@ -80,6 +80,9 @@ Content-Type: application/json
 	"debutYear": "2000-01-01",
 	"height": 1.8
 }
+
+### GET this new artist
+GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
 
 ### PATCH update artist
 PATCH http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
@@ -111,6 +114,9 @@ Content-Type: application/json
 	"artistId": "22222222-2222-2222-2222-000000000001",
 	"userId": "11111111-1111-1111-1111-000000000001"
 }
+
+### GET this new song
+GET http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
 
 ### PATCH update song
 PATCH http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009

@@ -1,9 +1,12 @@
+
 package music.artist.repository;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import music.artist.entity.Artist;
 
 import java.util.*;
 
+@ApplicationScoped
 public class ArtistRepository {
 
     private final Set<Artist> artists = new HashSet<>();

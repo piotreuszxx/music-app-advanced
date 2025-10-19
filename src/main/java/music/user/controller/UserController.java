@@ -1,5 +1,8 @@
+
 package music.user.controller;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import music.user.dto.GetUserResponse;
 import music.user.dto.GetUsersResponse;
 import music.user.dto.PatchUserRequest;
@@ -18,12 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@RequestScoped
 public class UserController {
 
-    private final UserService service;
-    private final SongService songService;
-    private final Path avatarDir;
+    private UserService service;
+    private SongService songService;
+    private Path avatarDir;
 
+    protected UserController() {
+    }
+
+    @Inject
     public UserController(UserService service, SongService songService, Path avatarDir) {
         this.service = service;
         this.songService = songService;

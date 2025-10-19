@@ -1,5 +1,8 @@
+
 package music.user.service;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import music.user.entity.User;
 import music.user.repository.UserRepository;
 
@@ -9,10 +12,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ApplicationScoped
 public class UserService {
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
+    protected UserService() {
+    }
+
+    @Inject
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

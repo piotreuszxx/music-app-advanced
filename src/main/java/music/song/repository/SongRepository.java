@@ -1,9 +1,12 @@
+
 package music.song.repository;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import music.song.entity.Song;
 
 import java.util.*;
 
+@ApplicationScoped
 public class SongRepository {
 
     private final Set<Song> songs = new HashSet<>();

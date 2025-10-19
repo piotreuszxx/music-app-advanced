@@ -1,5 +1,8 @@
+
 package music.song.controller;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import music.song.dto.GetSongsResponse;
 import music.song.dto.PatchSongRequest;
 import music.song.dto.PutSongRequest;
@@ -11,10 +14,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@RequestScoped
 public class SongController {
 
-    private final SongService service;
+    private SongService service;
 
+    protected SongController() {
+    }
+
+    @Inject
     public SongController(SongService service) {
         this.service = service;
     }

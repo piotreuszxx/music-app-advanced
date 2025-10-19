@@ -1,5 +1,8 @@
+
 package music.song.service;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import music.song.entity.Song;
 import music.song.repository.SongRepository;
 import music.song.dto.PutSongRequest;
@@ -9,12 +12,17 @@ import music.user.service.UserService;
 
 import java.util.*;
 
+@ApplicationScoped
 public class SongService {
 
-    private final SongRepository songRepository;
-    private final ArtistService artistService;
-    private final UserService userService;
+    private SongRepository songRepository;
+    private ArtistService artistService;
+    private UserService userService;
 
+    protected SongService() {
+    }
+
+    @Inject
     public SongService(SongRepository songRepository, ArtistService artistService, UserService userService) {
         this.songRepository = songRepository;
         this.artistService = artistService;
@@ -41,7 +49,6 @@ public class SongService {
         songRepository.find(id).ifPresent(songRepository::delete);
     }
 
-    // Business API that maintains links
     public boolean createWithLinks(PutSongRequest request, UUID uuid) {
         if (songRepository.find(uuid).isPresent()) return false;
         Song song = Song.builder()

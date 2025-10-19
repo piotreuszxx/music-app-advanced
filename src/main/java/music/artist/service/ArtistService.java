@@ -1,5 +1,8 @@
+
 package music.artist.service;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import music.artist.entity.Artist;
 import music.artist.repository.ArtistRepository;
 
@@ -7,10 +10,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@ApplicationScoped
 public class ArtistService {
 
-    private final ArtistRepository artistRepository;
+    private ArtistRepository artistRepository;
 
+    protected ArtistService() {
+    }
+
+    @Inject
     public ArtistService(ArtistRepository artistRepository) {
         this.artistRepository = artistRepository;
     }

@@ -1,21 +1,38 @@
+
 package music.artist.controller;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import music.artist.dto.GetArtistsResponse;
+import music.artist.dto.GetArtistResponse;
 import music.artist.dto.PatchArtistRequest;
 import music.artist.dto.PutArtistRequest;
 import music.artist.entity.Artist;
 import music.artist.service.ArtistService;
+import music.song.service.SongService;
+import music.song.dto.GetSongsResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@RequestScoped
 public class ArtistController {
 
-    private final ArtistService service;
+    private ArtistService service;
+    private SongService songService;
 
+    protected ArtistController() {
+    }
+
+    @Inject
     public ArtistController(ArtistService service) {
         this.service = service;
+    }
+
+    @Inject
+    public void setSongService(SongService songService) {
+        this.songService = songService;
     }
 
     public GetArtistsResponse getArtists() {
@@ -24,8 +41,20 @@ public class ArtistController {
                 .toList());
     }
 
-    public Artist getArtist(UUID id) {
-        return service.find(id).orElse(null);
+    public GetArtistResponse getArtist(UUID id) {
+        return service.find(id).map(a -> new GetArtistResponse(
+                a.getId(),
+                a.getName(),
+                a.getCountry(),
+                a.getDebutYear(),
+                a.getHeight(),
+                a.getSongs() == null ? null : a.getSongs().stream()
+                        .map(songId -> songService.find(songId)
+                                .map(s -> new GetSongsResponse.Song(s.getId(), s.getTitle()))
+                                .orElse(null))
+                        .filter(java.util.Objects::nonNull)
+                        .toList()
+        )).orElse(null);
     }
 
     public boolean createArtist(PutArtistRequest request, UUID uuid) {

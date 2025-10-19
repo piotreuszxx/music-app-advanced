@@ -10,20 +10,4 @@
         <param-value>avatars</param-value>
     </context-param>
 
-    <listener>
-        <listener-class>music.configuration.listener.CreateRepositories</listener-class>
-    </listener>
-
-    <listener>
-        <listener-class>music.configuration.listener.CreateServices</listener-class>
-    </listener>
-
-    <listener>
-        <listener-class>music.configuration.listener.CreateControllers</listener-class>
-    </listener>
-
-    <listener>
-        <listener-class>music.configuration.listener.InitializedData</listener-class>
-    </listener>
-
 </web-app>
