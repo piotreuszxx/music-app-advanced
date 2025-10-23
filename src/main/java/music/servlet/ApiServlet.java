@@ -34,14 +34,21 @@ public class ApiServlet extends HttpServlet {
         public static final String API = "/api";
     }
 
-    @Inject
     private UserController userController;
 
-    @Inject
     private ArtistController artistController;
 
-    @Inject
     private SongController songController;
+
+    protected ApiServlet() {
+    }
+
+    @Inject
+    public ApiServlet(UserController userController, ArtistController artistController, SongController songController) {
+        this.userController = userController;
+        this.artistController = artistController;
+        this.songController = songController;
+    }
 
     /// for PATCH method support
     @Override
