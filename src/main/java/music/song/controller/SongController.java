@@ -37,6 +37,12 @@ public class SongController {
         return service.find(id).orElse(null);
     }
 
+    public GetSongsResponse getSongsByArtist(UUID artistId) {
+        return new GetSongsResponse(service.findByArtist(artistId).stream()
+                .map(s -> new GetSongsResponse.Song(s.getId(), s.getTitle()))
+                .toList());
+    }
+
     public boolean createSong(PutSongRequest request, UUID uuid) {
         return service.createWithLinks(request, uuid);
     }

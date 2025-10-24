@@ -98,6 +98,17 @@ public class ApiServlet extends HttpServlet {
                 response.getWriter().write(jsonb.toJson(artist));
                 return;
 
+            } else if (path.matches(Patterns.ARTIST_SONGS.pattern())) {
+                UUID uuid = extractUuid(Patterns.ARTIST_SONGS, path);
+
+                if (artistController.getArtist(uuid) == null) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+                response.setContentType("application/json");
+                response.getWriter().write(jsonb.toJson(songController.getSongsByArtist(uuid)));
+                return;
+
             } else if (path.matches(Patterns.SONGS.pattern())) {
                 response.setContentType("application/json");
                 response.getWriter().write(jsonb.toJson(songController.getSongs()));
@@ -313,6 +324,8 @@ public class ApiServlet extends HttpServlet {
         public static final Pattern ARTISTS = Pattern.compile("/artists/?");
 
         public static final Pattern ARTIST = Pattern.compile("/artists/(%s)".formatted(UUID.pattern()));
+        
+    public static final Pattern ARTIST_SONGS = Pattern.compile("/artists/(%s)/songs/?".formatted(UUID.pattern()));
 
         public static final Pattern SONGS = Pattern.compile("/songs/?");
 

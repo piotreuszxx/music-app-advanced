@@ -129,3 +129,6 @@ Content-Type: application/json
 
 ### DELETE song
 DELETE http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
+
+### GET songs by artist
+GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs

@@ -37,6 +37,10 @@ public class SongService {
         return songRepository.findAll();
     }
 
+    public List<Song> findByArtist(UUID artistId) {
+        return songRepository.findByArtist(artistId);
+    }
+
     public void create(Song song) {
         songRepository.create(song);
     }

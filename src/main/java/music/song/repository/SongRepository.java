@@ -21,6 +21,13 @@ public class SongRepository {
         return new ArrayList<>(songs);
     }
 
+    public List<Song> findByArtist(UUID artistId) {
+        if (artistId == null) return List.of();
+        return songs.stream()
+                .filter(s -> artistId.equals(s.getArtistUuid()))
+                .toList();
+    }
+
     public void create(Song song) {
         if (songs.stream().anyMatch(s -> s.getId().equals(song.getId()))) {
             throw new IllegalArgumentException("Song with id " + song.getId() + " already exists.");
