@@ -20,7 +20,6 @@ import java.util.UUID;
 public class ArtistController {
 
     private ArtistService service;
-    private SongService songService;
 
     protected ArtistController() {
     }
@@ -28,11 +27,6 @@ public class ArtistController {
     @Inject
     public ArtistController(ArtistService service) {
         this.service = service;
-    }
-
-    @Inject
-    public void setSongService(SongService songService) {
-        this.songService = songService;
     }
 
     public GetArtistsResponse getArtists() {
@@ -49,16 +43,13 @@ public class ArtistController {
                 a.getDebutYear(),
                 a.getHeight(),
                 a.getSongs() == null ? null : a.getSongs().stream()
-                        .map(songId -> songService.find(songId)
-                                .map(s -> new GetSongsResponse.Song(s.getId(), s.getTitle()))
-                                .orElse(null))
-                        .filter(java.util.Objects::nonNull)
+                        .map(s -> new GetSongsResponse.Song(s.getId(), s.getTitle()))
                         .toList()
         )).orElse(null);
     }
 
     public boolean createArtist(PutArtistRequest request, UUID uuid) {
-        if(service.find(uuid).isEmpty()) {
+        if (service.find(uuid).isEmpty()) {
             Artist artist = Artist.builder()
                     .id(uuid)
                     .name(request.getName())

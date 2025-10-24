@@ -33,8 +33,18 @@ public class SongController {
                 .toList());
     }
 
-    public Song getSong(UUID id) {
-        return service.find(id).orElse(null);
+    public music.song.dto.GetSongResponse getSong(UUID id) {
+        return service.find(id)
+                .map(s -> new music.song.dto.GetSongResponse(
+                        s.getId(),
+                        s.getTitle(),
+                        s.getGenre(),
+                        s.getReleaseYear(),
+                        s.getDuration(),
+                        s.getArtist() != null ? s.getArtist().getId() : null,
+                        s.getUser() != null ? s.getUser().getId() : null
+                ))
+                .orElse(null);
     }
 
     public GetSongsResponse getSongsByArtist(UUID artistId) {

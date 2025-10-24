@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import music.song.entity.Song;
 
 @Builder
 @Getter
@@ -38,5 +39,5 @@ public class User implements Serializable {
     @ToString.Exclude//It's common to exclude lists from toString
     @EqualsAndHashCode.Exclude
     @Builder.Default
-    private List<UUID> songs = new ArrayList<>();
+    private List<Song> songs = new ArrayList<>();
 }

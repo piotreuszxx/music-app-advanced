@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import music.song.entity.Song;
 
 @Getter
 @Setter
@@ -27,5 +28,5 @@ public class Artist implements Serializable {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Builder.Default
-    private List<UUID> songs = new ArrayList<>();
+    private List<Song> songs = new ArrayList<>();
 }

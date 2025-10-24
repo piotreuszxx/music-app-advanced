@@ -61,29 +61,39 @@ public class SongService {
                 .genre(request.getGenre())
                 .releaseYear(request.getReleaseYear())
                 .duration(request.getDuration())
-                .artistUuid(request.getArtistId())
-                .userUuid(request.getUserId())
                 .build();
+
+        // attach artist object if provided
+        if (request.getArtistId() != null) {
+            artistService.find(request.getArtistId()).ifPresent(artist -> {
+                song.setArtist(artist);
+            });
+        }
+
+        // attach user object if provided
+        if (request.getUserId() != null) {
+            userService.find(request.getUserId()).ifPresent(user -> {
+                song.setUser(user);
+            });
+        }
 
         // persist song first
         songRepository.create(song);
 
-        // link to artist
-        if (request.getArtistId() != null) {
-            artistService.find(request.getArtistId()).ifPresent(artist -> {
-                if (artist.getSongs() == null) artist.setSongs(new java.util.ArrayList<>());
-                artist.getSongs().add(song.getId());
-                artistService.update(artist);
-            });
+        // link to artist (add Song object to artist.songs)
+        if (song.getArtist() != null) {
+            var artist = song.getArtist();
+            if (artist.getSongs() == null) artist.setSongs(new ArrayList<>());
+            artist.getSongs().add(song);
+            artistService.update(artist);
         }
 
-        // link to user
-        if (request.getUserId() != null) {
-            userService.find(request.getUserId()).ifPresent(user -> {
-                if (user.getSongs() == null) user.setSongs(new java.util.ArrayList<>());
-                user.getSongs().add(song.getId());
-                userService.update(user);
-            });
+        // link to user (add Song object to user.songs)
+        if (song.getUser() != null) {
+            var user = song.getUser();
+            if (user.getSongs() == null) user.setSongs(new ArrayList<>());
+            user.getSongs().add(song);
+            userService.update(user);
         }
 
         return true;
@@ -95,33 +105,34 @@ public class SongService {
             if (request.getGenre() != null) song.setGenre(request.getGenre());
             if (request.getReleaseYear() != null) song.setReleaseYear(request.getReleaseYear());
             if (request.getDuration() != null) song.setDuration(request.getDuration());
-
             // re-link artist
             if (request.getArtistId() != null) {
-                UUID oldArtistId = song.getArtistUuid();
-                if (oldArtistId != null) {
-                    artistService.find(oldArtistId).ifPresent(oldArtist -> oldArtist.getSongs().removeIf(id -> Objects.equals(id, song.getId())));
+                var oldArtist = song.getArtist();
+                if (oldArtist != null) {
+                    oldArtist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
+                    artistService.update(oldArtist);
                 }
                 artistService.find(request.getArtistId()).ifPresent(newArtist -> {
                     if (newArtist.getSongs() == null) newArtist.setSongs(new ArrayList<>());
-                    newArtist.getSongs().add(song.getId());
+                    newArtist.getSongs().add(song);
                     artistService.update(newArtist);
+                    song.setArtist(newArtist);
                 });
-                song.setArtistUuid(request.getArtistId());
             }
 
             // re-link user
             if (request.getUserId() != null) {
-                UUID oldUserId = song.getUserUuid();
-                if (oldUserId != null) {
-                    userService.find(oldUserId).ifPresent(oldUser -> { if (oldUser.getSongs() != null) oldUser.getSongs().removeIf(id -> Objects.equals(id, song.getId())); });
+                var oldUser = song.getUser();
+                if (oldUser != null) {
+                    if (oldUser.getSongs() != null) oldUser.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
+                    userService.update(oldUser);
                 }
                 userService.find(request.getUserId()).ifPresent(newUser -> {
                     if (newUser.getSongs() == null) newUser.setSongs(new ArrayList<>());
-                    newUser.getSongs().add(song.getId());
+                    newUser.getSongs().add(song);
                     userService.update(newUser);
+                    song.setUser(newUser);
                 });
-                song.setUserUuid(request.getUserId());
             }
 
             songRepository.update(song);
@@ -131,19 +142,15 @@ public class SongService {
 
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
-            UUID artistId = song.getArtistUuid();
-            UUID userId = song.getUserUuid();
-            if (artistId != null) {
-                artistService.find(artistId).ifPresent(artist -> {
-                    if (artist.getSongs() != null) artist.getSongs().removeIf(id -> Objects.equals(id, song.getId()));
-                    artistService.update(artist);
-                });
+            var artist = song.getArtist();
+            var user = song.getUser();
+            if (artist != null) {
+                if (artist.getSongs() != null) artist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
+                artistService.update(artist);
             }
-            if (userId != null) {
-                userService.find(userId).ifPresent(user -> {
-                    if (user.getSongs() != null) user.getSongs().removeIf(id -> Objects.equals(id, song.getId()));
-                    userService.update(user);
-                });
+            if (user != null) {
+                if (user.getSongs() != null) user.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
+                userService.update(user);
             }
             songRepository.delete(song);
         });

@@ -139,30 +139,9 @@ public class InitializedData {
                 artistService.create(artist1);
                 artistService.create(artist2);
 
-                // initialize songs
-                Song song1 = Song.builder()
-                                .id(UUID.fromString("33333333-3333-3333-3333-000000000001"))
-                                .title("You Was Right")
-                                .genre(Genre.HIPHOP)
-                                .releaseYear(LocalDate.of(2016, 1, 1))
-                                .duration(3.5)
-                                .artistUuid(artist1.getId())
-                                .userUuid(piotr.getId())
-                                .build();
-
-                Song song2 = Song.builder()
-                                .id(UUID.fromString("33333333-3333-3333-3333-000000000002"))
-                                .title("Stay")
-                                .genre(Genre.POP)
-                                .releaseYear(LocalDate.of(2021, 1, 1))
-                                .duration(2.7)
-                                .artistUuid(artist2.getId())
-                                .userUuid(nicole.getId())
-                                .build();
-
-                // persist songs and also update relations
-                songService.createWithLinks(new PutSongRequest(song1.getTitle(), song1.getGenre(), song1.getReleaseYear(), song1.getDuration(), song1.getArtistUuid(), song1.getUserUuid()), song1.getId());
-                songService.createWithLinks(new PutSongRequest(song2.getTitle(), song2.getGenre(), song2.getReleaseYear(), song2.getDuration(), song2.getArtistUuid(), song2.getUserUuid()), song2.getId());
+                // initialize and persist songs (use service to maintain relations)
+                songService.createWithLinks(new PutSongRequest("You Was Right", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000001"));
+                songService.createWithLinks(new PutSongRequest("Stay", Genre.POP, LocalDate.of(2021, 1, 1), 2.7, artist2.getId(), nicole.getId()), UUID.fromString("33333333-3333-3333-3333-000000000002"));
         }
 
         private byte[] readAvatar(String fileName) {

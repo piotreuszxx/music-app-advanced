@@ -25,16 +25,14 @@ import java.util.UUID;
 public class UserController {
 
     private UserService service;
-    private SongService songService;
     private Path avatarDir;
 
     protected UserController() {
     }
 
     @Inject
-    public UserController(UserService service, SongService songService, Path avatarDir) {
+    public UserController(UserService service, Path avatarDir) {
         this.service = service;
-        this.songService = songService;
         this.avatarDir = avatarDir;
     }
 
@@ -46,10 +44,7 @@ public class UserController {
             user.getSurname(),
             user.getEmail(),
             user.getSongs().stream()
-                .map(songId -> songService.find(songId)
-                    .map(s -> new GetSongsResponse.Song(s.getId(), s.getTitle()))
-                    .orElse(null))
-                .filter(java.util.Objects::nonNull)
+                .map(s -> new GetSongsResponse.Song(s.getId(), s.getTitle()))
                 .toList()))
         .orElse(null);
     }

@@ -24,7 +24,7 @@ public class SongRepository {
     public List<Song> findByArtist(UUID artistId) {
         if (artistId == null) return List.of();
         return songs.stream()
-                .filter(s -> artistId.equals(s.getArtistUuid()))
+                .filter(s -> s.getArtist() != null && artistId.equals(s.getArtist().getId()))
                 .toList();
     }
 
