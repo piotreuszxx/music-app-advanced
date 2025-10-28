@@ -4,10 +4,6 @@ package music.user.repository;
 import jakarta.enterprise.context.ApplicationScoped;
 import music.user.entity.User;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @ApplicationScoped

@@ -3,6 +3,7 @@ package music.user.controller;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
 import music.user.dto.GetUserResponse;
 import music.user.dto.GetUsersResponse;
 import music.user.dto.PatchUserRequest;
@@ -25,15 +26,22 @@ import java.util.UUID;
 public class UserController {
 
     private UserService service;
-    private Path avatarDir;
+    private ServletContext servletContext;
 
     protected UserController() {
     }
 
     @Inject
-    public UserController(UserService service, Path avatarDir) {
+    public UserController(UserService service, ServletContext servletContext) {
         this.service = service;
-        this.avatarDir = avatarDir;
+        this.servletContext = servletContext;
+    }
+
+    private Path getAvatarDirPath() {
+        String avatarParam = servletContext.getInitParameter("avatarDir");
+        String base = servletContext.getRealPath("/");
+        if (base == null) base = System.getProperty("java.io.tmpdir");
+        return Path.of(base, avatarParam);
     }
 
     public GetUserResponse getUser(UUID uuid) {
@@ -96,7 +104,20 @@ public class UserController {
 
     public byte[] getUserAvatar(UUID id) {
         return service.find(id)
-                .map(User::getAvatar)
+                .map(user -> {
+                    try {
+                        Path dir = getAvatarDirPath();
+                        var path = dir.resolve(user.getId().toString() + ".png");
+                        if (Files.exists(path)) {
+                            System.out.println("[DEBUG] Reading avatar from file: " + path);
+                            return Files.readAllBytes(path);
+                        }
+                    } catch (IOException e) {
+                        System.err.println("[WARN] Failed to read avatar file: " + e.getMessage());
+                    }
+                    // will return null if no avatar file found, can be return null;
+                    return user.getAvatar();
+                })
                 .orElse(null);
     }
 
@@ -104,11 +125,16 @@ public class UserController {
         return service.find(uuid)
                 .map(user -> {
                     try {
-                        user.setAvatar(avatarStream.readAllBytes());
+                        byte[] bytes = avatarStream.readAllBytes();
+                        // update avatar byte[] field
+                        user.setAvatar(bytes);
                         service.update(user);
-                        Files.write(avatarDir.resolve(user.getId().toString() + ".png"), avatarStream.readAllBytes());
+                        // write/overwrite real file
+                        Path dir = getAvatarDirPath();
+                        if (!java.nio.file.Files.exists(dir)) java.nio.file.Files.createDirectories(dir);
+                        java.nio.file.Files.write(dir.resolve(user.getId().toString() + ".png"), bytes);
                     } catch (IOException e) {
-                        throw new IllegalStateException("Failed to read avatar", e);
+                        throw new IllegalStateException("Failed to read or write avatar", e);
                     }
                     return true;
                 })
@@ -118,9 +144,24 @@ public class UserController {
     public boolean deleteUserAvatar(UUID uuid) {
         return service.find(uuid)
                 .map(user -> {
-                    user.setAvatar(null);
-                    service.update(user);
-                    return true;
+                        Path dir = getAvatarDirPath();
+                        var path = dir.resolve(user.getId().toString() + ".png");
+                        boolean fileDeleted = false;
+                        try {
+                            fileDeleted = java.nio.file.Files.deleteIfExists(path);
+                        } catch (IOException e) {
+                            System.err.println("[WARN] Failed to delete avatar file: " + e.getMessage());
+                        }
+
+                        // ff there was no file and no byte[] avatar, treat as Not Found
+                        if (!fileDeleted && user.getAvatar() == null) {
+                            return false;
+                        }
+
+                        // clear byte[] avatar field
+                        user.setAvatar(null);
+                        service.update(user);
+                        return true;
                 })
                 .orElse(false); // user does not exist
     }
@@ -128,7 +169,8 @@ public class UserController {
 
     private byte[] readAvatar(String fileName) {
         try {
-            Path avatarPath = avatarDir.resolve(fileName);
+            Path dir = getAvatarDirPath();
+            Path avatarPath = dir.resolve(fileName);
             if (Files.exists(avatarPath)) {
                 return Files.readAllBytes(avatarPath);
             } else {
