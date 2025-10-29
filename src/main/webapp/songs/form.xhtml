@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{songForm.id}" />
+        <f:viewParam name="artistId" value="#{songForm.artistId}" />
+        <f:viewAction action="#{songForm.init}" />
+    </f:metadata>
+
+    <ui:define name="content">
+        <h2>Song form</h2>
+
+        <h:form>
+            <h:panelGrid columns="2">
+                <h:outputText value="Title:" />
+                <h:inputText value="#{songForm.song.title}" />
+
+                <h:outputText value="Genre:" />
+                <h:selectOneMenu value="#{songForm.song.genre}">
+                    <f:selectItems value="#{songForm.genres}" var="g" itemLabel="#{g}" itemValue="#{g}" />
+                </h:selectOneMenu>
+
+                <h:outputText value="Release year (YYYY-MM-DD):" />
+                <h:inputText value="#{songForm.releaseYearString}" />
+
+                <h:outputText value="Duration:" />
+                <h:inputText value="#{songForm.song.duration}" />
+
+                <h:outputText value="Artist:" />
+                <h:selectOneMenu value="#{songForm.song.artist}" converter="artistConverter">
+                    <f:selectItems value="#{songForm.artists}" var="a" itemLabel="#{a.name}" itemValue="#{a}" />
+                </h:selectOneMenu>
+            </h:panelGrid>
+
+            <h:commandButton value="Save" action="#{songForm.save}" />
+            <h:commandButton value="Cancel" action="/artists/list.xhtml?faces-redirect=true" immediate="true" />
+        </h:form>
+    </ui:define>
+</ui:composition>

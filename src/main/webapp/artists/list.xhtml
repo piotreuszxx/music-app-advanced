@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <ui:define name="content">
+        <h2>Artists</h2>
+
+        <h:form>
+            <h:dataTable value="#{artistList.artists}" var="artist">
+                <h:column>
+                    <f:facet name="header">Name</f:facet>
+                    #{artist.name}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <h:link outcome="/artists/view.xhtml" value="View">
+                        <f:param name="id" value="#{artist.id}"/>
+                    </h:link>
+                    &#160;
+                    <h:commandButton value="Delete" action="#{artistList.delete(artist.id)}"/>
+                </h:column>
+            </h:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

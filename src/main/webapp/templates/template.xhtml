@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+		xmlns:h="jakarta.faces.html"
+		xmlns:ui="jakarta.faces.facelets"
+		xmlns:f="jakarta.faces.core">
+	<f:view>
+		<h:head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Music App Advanced</title>
+
+			<h:outputStylesheet library="css" name="main.css"/>
+		</h:head>
+
+		<h:body>
+			<div class="container">
+				<header class="site-header">
+					<div class="brand">
+						<h:graphicImage library="images" name="logo.svg" styleClass="logo" alt="Music App logo"/>
+					</div>
+					<div class="tagline">A simple Jakarta EE / JSF frontend</div>
+				</header>
+
+				<nav class="main-nav">
+					<ul>
+						<li><h:link outcome="/index.xhtml" value="Home" styleClass="nav-link"/></li>
+						<li><h:link outcome="/artists/list.xhtml" value="Artists" styleClass="nav-link"/></li>
+						<!-- songs and users lists temporarily hidden from navigation, keeping for possible later use -->
+						<!-- <li><h:link outcome="/songs/list.xhtml" value="Songs" styleClass="nav-link"/></li> -->
+						<!-- <li><h:link outcome="/users/list.xhtml" value="Users" styleClass="nav-link"/></li> -->
+					</ul>
+				</nav>
+
+				<main class="content">
+					<ui:insert name="content">
+						<h:panelGroup>
+							<h2>Welcome</h2>
+							<p>This is the Music App Advanced. Please use the navigation to continue.</p>
+						</h:panelGroup>
+					</ui:insert>
+				</main>
+
+				<footer class="site-footer">
+					<div>© 2025 Music App Advanced - PP</div>
+				</footer>
+			</div>
+		</h:body>
+	</f:view>
+</html>

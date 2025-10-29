@@ -142,6 +142,7 @@ public class SongService {
 
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
+            System.out.println("[DEBUG] SongService.deleteWithUnlink: deleting song " + uuid);
             var artist = song.getArtist();
             var user = song.getUser();
             if (artist != null) {
@@ -154,5 +155,13 @@ public class SongService {
             }
             songRepository.delete(song);
         });
+    }
+
+    public void deleteByArtist(UUID artistId) {
+        if (artistId == null) return;
+        var songs = findByArtist(artistId);
+        for (Song s : songs) {
+            deleteWithUnlink(s.getId());
+        }
     }
 }

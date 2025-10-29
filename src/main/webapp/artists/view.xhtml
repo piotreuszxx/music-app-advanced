@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{artistView.id}" />
+        <f:viewAction action="#{artistView.init}" />
+    </f:metadata>
+
+    <ui:define name="content">
+        <h2>Artist details</h2>
+
+        <h:panelGrid columns="2">
+            <h:outputText value="Name:" />
+            <h:outputText value="#{artistView.artist.name}" />
+            <h:outputText value="Country:" />
+            <h:outputText value="#{artistView.artist.country}" />
+            <h:outputText value="Debut:" />
+            <h:outputText value="#{artistView.artist.debutYear}" />
+            <h:outputText value="Height:" />
+            <h:outputText value="#{artistView.artist.height}" />
+        </h:panelGrid>
+
+        <h:form>
+            <h:commandButton value="Delete artist" action="#{artistView.deleteArtist(artistView.id)}"/>
+        </h:form>
+
+        <h:form>
+            <h:link outcome="/songs/form.xhtml" value="Add song">
+                <f:param name="artistId" value="#{artistView.id}" />
+            </h:link>
+        </h:form>
+
+        <h3>Songs</h3>
+        <h:form>
+                <h:inputHidden id="artistId" value="#{artistView.id}" />
+                <h:dataTable value="#{artistView.songs}" var="song">
+                <h:column>
+                    <f:facet name="header">Title</f:facet>
+                    #{song.title}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">View</f:facet>
+                    <h:link outcome="/songs/view.xhtml">
+                        <f:param name="id" value="#{song.id}" />
+                        View
+                    </h:link>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Edit</f:facet>
+                    <h:link outcome="/songs/form.xhtml">
+                        <f:param name="id" value="#{song.id}" />
+                        Edit
+                    </h:link>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Actions</f:facet>
+                    <h:commandButton value="Delete" action="#{artistView.deleteSelectedSong}">
+                        <f:setPropertyActionListener target="#{artistView.songToDeleteId}" value="#{song.id.toString()}" />
+                    </h:commandButton>
+                </h:column>
+            </h:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>
