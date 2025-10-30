@@ -31,9 +31,9 @@
                 <h:inputText value="#{songForm.song.duration}" />
 
                 <h:outputText value="Artist:" />
-                <h:selectOneMenu value="#{songForm.song.artist}" converter="artistConverter">
-                    <f:selectItems value="#{songForm.artists}" var="a" itemLabel="#{a.name}" itemValue="#{a}" />
-                </h:selectOneMenu>
+                    <h:selectOneMenu value="#{songForm.song.artist}" converter="artistConverter">
+                        <f:selectItems value="#{songForm.artists}" var="a" itemLabel="#{a.name}" itemValue="#{a}" />
+                    </h:selectOneMenu>
             </h:panelGrid>
 
             <h:commandButton value="Save" action="#{songForm.save}" />

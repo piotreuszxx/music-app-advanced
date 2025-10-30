@@ -3,9 +3,11 @@ package music.artist.jsf;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
-import music.artist.entity.Artist;
+import music.artist.dto.GetArtistResponse;
 import music.artist.service.ArtistService;
 import music.song.service.SongService;
 
@@ -15,6 +17,8 @@ import java.util.UUID;
 
 @Named("artistView")
 @ViewScoped
+@Getter
+@Setter
 public class ArtistViewBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -26,49 +30,34 @@ public class ArtistViewBean implements Serializable {
     SongService songService;
 
     private String id;
-    private Artist artist;
+    private GetArtistResponse artist;
     private String songToDeleteId;
 
     public void init() {
         if (id != null) {
             try {
                 UUID uuid = UUID.fromString(id);
-                Optional<Artist> a = artistService.find(uuid);
+                Optional<GetArtistResponse> a = artistService.findDto(uuid);
                 artist = a.orElse(null);
             } catch (IllegalArgumentException ignored) {
             }
         }
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Artist getArtist() {
+    public GetArtistResponse getArtistDto() {
         return artist;
     }
 
     public List<?> getSongs() {
         if (id == null) return List.of();
-        try {
-            UUID aid = UUID.fromString(id);
-            return songService.findByArtist(aid);
-        } catch (IllegalArgumentException e) {
-            return List.of();
-        }
+            try {
+                UUID aid = UUID.fromString(id);
+                return songService.findByArtistDtos(aid);
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
     }
 
-    public String getSongToDeleteId() {
-        return songToDeleteId;
-    }
-
-    public void setSongToDeleteId(String songToDeleteId) {
-        this.songToDeleteId = songToDeleteId;
-    }
 
     public String deleteSelectedSong() {
         if (songToDeleteId == null) return null;

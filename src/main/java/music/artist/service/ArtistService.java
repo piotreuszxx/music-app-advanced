@@ -4,6 +4,9 @@ package music.artist.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import music.artist.entity.Artist;
+import music.artist.dto.GetArtistsResponse;
+import music.artist.dto.GetArtistResponse;
+import music.song.dto.GetSongsResponse;
 import music.artist.repository.ArtistRepository;
 
 import java.util.List;
@@ -29,6 +32,36 @@ public class ArtistService {
 
     public List<Artist> findAll() {
         return artistRepository.findAll();
+    }
+
+    // DTO helpers
+    public List<GetArtistsResponse.Artist> findAllDtos() {
+        var list = findAll();
+        return list.stream().map(a -> GetArtistsResponse.Artist.builder()
+                .id(a.getId())
+                .name(a.getName())
+                .build()).toList();
+    }
+
+    public Optional<GetArtistResponse> findDto(UUID id) {
+        return find(id).map(a -> {
+            GetArtistResponse dto = new GetArtistResponse();
+            dto.setId(a.getId());
+            dto.setName(a.getName());
+            dto.setCountry(a.getCountry());
+            dto.setDebutYear(a.getDebutYear());
+            dto.setHeight(a.getHeight());
+            // map songs as small DTOs
+            if (a.getSongs() != null) {
+                dto.setSongs(a.getSongs().stream().map(s -> {
+                    var small = new GetSongsResponse.Song();
+                    small.setId(s.getId());
+                    small.setTitle(s.getTitle());
+                    return small;
+                }).toList());
+            }
+            return dto;
+        });
     }
 
     public void create(Artist artist) {

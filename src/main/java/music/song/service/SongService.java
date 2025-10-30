@@ -7,6 +7,8 @@ import music.song.entity.Song;
 import music.song.repository.SongRepository;
 import music.song.dto.PutSongRequest;
 import music.song.dto.PatchSongRequest;
+import music.song.dto.GetSongResponse;
+import music.song.dto.GetSongsResponse;
 import music.artist.service.ArtistService;
 import music.user.service.UserService;
 
@@ -39,6 +41,33 @@ public class SongService {
 
     public List<Song> findByArtist(UUID artistId) {
         return songRepository.findByArtist(artistId);
+    }
+
+    public List<GetSongsResponse.Song> findByArtistDtos(UUID artistId) {
+        return findByArtist(artistId).stream().map(this::toSmallDto).toList();
+    }
+
+    public Optional<GetSongResponse> findDto(UUID id) {
+        return find(id).map(this::toFullDto);
+    }
+
+    private GetSongsResponse.Song toSmallDto(Song s) {
+        var r = new GetSongsResponse.Song();
+        r.setId(s.getId());
+        r.setTitle(s.getTitle());
+        return r;
+    }
+
+    private GetSongResponse toFullDto(Song s) {
+        var r = new GetSongResponse();
+        r.setId(s.getId());
+        r.setTitle(s.getTitle());
+        r.setGenre(s.getGenre());
+        r.setReleaseYear(s.getReleaseYear());
+        r.setDuration(s.getDuration());
+        r.setArtistId(s.getArtist() == null ? null : s.getArtist().getId());
+        r.setUserId(s.getUser() == null ? null : s.getUser().getId());
+        return r;
     }
 
     public void create(Song song) {

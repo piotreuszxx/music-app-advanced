@@ -15,21 +15,20 @@
 
         <h:panelGrid columns="2">
             <h:outputText value="Title:" />
-            <h:outputText value="#{songView.song.title}" />
+            <h:outputText value="#{songView.songDto.title}" />
             <h:outputText value="Genre:" />
-            <h:outputText value="#{songView.song.genre}" />
+            <h:outputText value="#{songView.songDto.genre}" />
             <h:outputText value="Release year:" />
-            <h:outputText value="#{songView.song.releaseYear}" />
+            <h:outputText value="#{songView.songDto.releaseYear}" />
             <h:outputText value="Duration:" />
-            <h:outputText value="#{songView.song.duration}" />
+            <h:outputText value="#{songView.songDto.duration}" />
             <h:outputText value="Artist:" />
             <h:panelGroup>
-                <h:outputText rendered="#{not empty songView.song.artist}" value="" />
-                <h:link rendered="#{not empty songView.song.artist}" outcome="/artists/view.xhtml"> 
-                    <f:param name="id" value="#{songView.song.artist.id}" />
-                    #{songView.song.artist.name}
-                </h:link>
-                <h:outputText rendered="#{empty songView.song.artist}" value="-" />
+                    <h:link rendered="#{not empty songView.songDto.artistId}" outcome="/artists/view.xhtml">
+                        <f:param name="id" value="#{songView.songDto.artistId}" />
+                        #{songView.artistName}
+                    </h:link>
+                    <h:outputText rendered="#{empty songView.songDto.artistId}" value="-" />
             </h:panelGroup>
         </h:panelGrid>
 

@@ -3,7 +3,7 @@ package music.artist.jsf;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import music.artist.entity.Artist;
+import music.artist.dto.GetArtistsResponse;
 import music.artist.service.ArtistService;
 import music.song.service.SongService;
 
@@ -20,8 +20,8 @@ public class ArtistListBean {
     @Inject
     SongService songService;
 
-    public List<Artist> getArtists() {
-        return artistService.findAll();
+    public List<GetArtistsResponse.Artist> getArtists() {
+        return artistService.findAllDtos();
     }
 
     public String delete(UUID id) {

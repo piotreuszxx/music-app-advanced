@@ -1,6 +1,5 @@
 package music.song.jsf;
 
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
