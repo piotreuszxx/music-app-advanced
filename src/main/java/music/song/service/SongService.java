@@ -3,6 +3,7 @@ package music.song.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import music.artist.entity.Artist;
 import music.song.entity.Song;
 import music.song.repository.SongRepository;
 import music.song.dto.PutSongRequest;
@@ -10,6 +11,7 @@ import music.song.dto.PatchSongRequest;
 import music.song.dto.GetSongResponse;
 import music.song.dto.GetSongsResponse;
 import music.artist.service.ArtistService;
+import music.user.entity.User;
 import music.user.service.UserService;
 
 import java.util.*;
@@ -171,9 +173,9 @@ public class SongService {
 
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
-            System.out.println("[DEBUG] SongService.deleteWithUnlink: deleting song " + uuid);
-            var artist = song.getArtist();
-            var user = song.getUser();
+            // System.out.println("[DEBUG] SongService.deleteWithUnlink: deleting song " + uuid);
+            Artist artist = song.getArtist();
+            User user = song.getUser();
             if (artist != null) {
                 if (artist.getSongs() != null) artist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
                 artistService.update(artist);

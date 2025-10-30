@@ -109,11 +109,11 @@ public class UserController {
                         Path dir = getAvatarDirPath();
                         var path = dir.resolve(user.getId().toString() + ".png");
                         if (Files.exists(path)) {
-                            System.out.println("[DEBUG] Reading avatar from file: " + path);
+                            //System.out.println("Reading avatar from file: " + path);
                             return Files.readAllBytes(path);
                         }
                     } catch (IOException e) {
-                        System.err.println("[WARN] Failed to read avatar file: " + e.getMessage());
+                        System.err.println("Failed to read avatar file: " + e.getMessage());
                     }
                     // will return null if no avatar file found, can be return null;
                     return user.getAvatar();
