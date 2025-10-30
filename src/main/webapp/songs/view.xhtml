@@ -12,25 +12,28 @@
 
     <ui:define name="content">
         <h2>Song details</h2>
+    <h:outputText value="Not found" rendered="#{songView.notFound}" />
 
-        <h:panelGrid columns="2">
-            <h:outputText value="Title:" />
-            <h:outputText value="#{songView.songDto.title}" />
-            <h:outputText value="Genre:" />
-            <h:outputText value="#{songView.songDto.genre}" />
-            <h:outputText value="Release year:" />
-            <h:outputText value="#{songView.songDto.releaseYear}" />
-            <h:outputText value="Duration:" />
-            <h:outputText value="#{songView.songDto.duration}" />
-            <h:outputText value="Artist:" />
-            <h:panelGroup>
-                    <h:link rendered="#{not empty songView.songDto.artistId}" outcome="/artists/view.xhtml">
-                        <f:param name="id" value="#{songView.songDto.artistId}" />
-                        #{songView.artistName}
-                    </h:link>
-                    <h:outputText rendered="#{empty songView.songDto.artistId}" value="-" />
-            </h:panelGroup>
-        </h:panelGrid>
+    <h:panelGroup rendered="#{not songView.notFound}">
+            <h:panelGrid columns="2">
+                <h:outputText value="Title:" />
+                <h:outputText value="#{songView.songDto.title}" />
+                <h:outputText value="Genre:" />
+                <h:outputText value="#{songView.songDto.genre}" />
+                <h:outputText value="Release year:" />
+                <h:outputText value="#{songView.songDto.releaseYear}" />
+                <h:outputText value="Duration:" />
+                <h:outputText value="#{songView.songDto.duration}" />
+                <h:outputText value="Artist:" />
+                <h:panelGroup>
+                        <h:link rendered="#{not empty songView.songDto.artistId}" outcome="/artists/view.xhtml">
+                            <f:param name="id" value="#{songView.songDto.artistId}" />
+                            #{songView.artistName}
+                        </h:link>
+                        <h:outputText rendered="#{empty songView.songDto.artistId}" value="-" />
+                </h:panelGroup>
+            </h:panelGrid>
+        </h:panelGroup>
 
     </ui:define>
 </ui:composition>

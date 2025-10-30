@@ -31,6 +31,7 @@ public class SongViewBean implements Serializable {
 
     private String id;
     private GetSongResponse song;
+    private boolean notFound = false;
     private GetArtistResponse artist;
 
     public void init() {
@@ -39,6 +40,7 @@ public class SongViewBean implements Serializable {
                 UUID uuid = UUID.fromString(id);
                 Optional<GetSongResponse> s = songService.findDto(uuid);
                 song = s.orElse(null);
+                notFound = (song == null);
                 if (song != null && song.getArtistId() != null) {
                     artist = artistService.findDto(song.getArtistId()).orElse(null);
                 }

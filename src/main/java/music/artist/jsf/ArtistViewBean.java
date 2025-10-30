@@ -31,6 +31,7 @@ public class ArtistViewBean implements Serializable {
 
     private String id;
     private GetArtistResponse artist;
+    private boolean notFound = false;
     private String songToDeleteId;
 
     public void init() {
@@ -39,6 +40,7 @@ public class ArtistViewBean implements Serializable {
                 UUID uuid = UUID.fromString(id);
                 Optional<GetArtistResponse> a = artistService.findDto(uuid);
                 artist = a.orElse(null);
+                notFound = (artist == null);
             } catch (IllegalArgumentException ignored) {
             }
         }
