@@ -31,7 +31,7 @@
                 <h:inputText value="#{songForm.song.duration}" />
 
                 <h:outputText value="Artist:" />
-                    <h:selectOneMenu value="#{songForm.song.artist}" converter="artistConverter">
+                    <h:selectOneMenu value="#{songForm.song.artist}" converter="artistDtoConverter">
                         <f:selectItems value="#{songForm.artists}" var="a" itemLabel="#{a.name}" itemValue="#{a}" />
                     </h:selectOneMenu>
             </h:panelGrid>

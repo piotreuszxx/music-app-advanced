@@ -15,7 +15,7 @@ import java.util.UUID;
 import music.song.entity.Genre;
 import music.song.service.SongService;
 import music.artist.service.ArtistService;
-import music.artist.entity.Artist;
+import music.artist.dto.GetArtistsResponse;
 import music.song.dto.PutSongRequest;
 import music.song.dto.PatchSongRequest;
 import music.song.dto.SongFormDto;
@@ -42,27 +42,29 @@ public class SongFormBean implements Serializable {
         if (id != null && !id.isBlank()) {
             try {
                 UUID uuid = UUID.fromString(id);
-                Optional<music.song.entity.Song> s = songService.find(uuid);
+                Optional<music.song.dto.GetSongResponse> s = songService.findDto(uuid);
                 if (s.isPresent()) {
-                    music.song.entity.Song ent = s.get();
-                    song.setId(ent.getId());
-                    song.setTitle(ent.getTitle());
-                    song.setGenre(ent.getGenre());
-                    song.setReleaseYear(ent.getReleaseYear());
-                    song.setDuration(ent.getDuration());
-                    song.setArtist(ent.getArtist());
+                    music.song.dto.GetSongResponse dto = s.get();
+                    song.setId(dto.getId());
+                    song.setTitle(dto.getTitle());
+                    song.setGenre(dto.getGenre());
+                    song.setReleaseYear(dto.getReleaseYear());
+                    song.setDuration(dto.getDuration());
+                    if (dto.getArtistId() != null) {
+                        artistService.findDto(dto.getArtistId()).ifPresent(a -> song.setArtist(new GetArtistsResponse.Artist(a.getId(), a.getName())));
+                    }
                 }
             } catch (IllegalArgumentException ignored) {}
         } else if (artistId != null && !artistId.isBlank()) {
             try {
                 UUID aid = UUID.fromString(artistId);
-                artistService.find(aid).ifPresent(song::setArtist);
+                artistService.findDto(aid).ifPresent(a -> song.setArtist(new GetArtistsResponse.Artist(a.getId(), a.getName())));
             } catch (IllegalArgumentException ignored) {}
         }
     }
 
-    public List<Artist> getArtists() {
-        return artistService.findAll();
+    public List<GetArtistsResponse.Artist> getArtists() {
+        return artistService.findAllDtos();
     }
 
     public Genre[] getGenres() {
