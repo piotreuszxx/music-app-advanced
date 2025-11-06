@@ -12,11 +12,11 @@ PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-0
 Content-Type: application/json
 
 {
-"login": "createuser",
-"name": "createname",
-"surname": "createsurname",
-"email": "createuser@gmail.com",
-"password": "createuserpassword"
+	"login": "createuser",
+	"name": "createname",
+	"surname": "createsurname",
+	"email": "createuser@gmail.com",
+	"password": "createuserpassword"
 }
 
 ### GET this new user
@@ -27,11 +27,11 @@ PATCH http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111
 Content-Type: application/json
 
 {
-"login": "updatedlogin",
-"name": "updatedname",
-"surname": "updatedsurname",
-"email": "updatedemail@gmail.com",
-"password": "updatedpassword"
+	"login": "updatedlogin",
+	"name": "updatedname",
+	"surname": "updatedsurname",
+	"email": "updatedemail@gmail.com",
+	"password": "updatedpassword"
 }
 
 ### DELETE user
@@ -52,7 +52,7 @@ PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-0
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
-Content-Disposition: form-data; name="avatar"; filename="new_av.png'
+Content-Disposition: form-data; name="avatar"; filename="new_av.png"
 
 < src/main/resources/avatars/new_av.png
 --boundary--
@@ -64,11 +64,18 @@ GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-0
 DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
 
 
-### GET artists
+############################
+# artists and songs
+############################
+
+### GET all artists
 GET http://localhost:9080/music-app-advanced/api/artists
 
-### GET artist by id (example)
+### GET artist by id (existing)
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001
+
+### GET artist by id (not existing)
+GET http://localhost:9080/music-app-advanced/api/artists/00000000-0000-0000-0000-000000000000
 
 ### PUT create artist
 PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
@@ -81,10 +88,21 @@ Content-Type: application/json
 	"height": 1.8
 }
 
+### PUT create artist (conflict - same id)
+PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+Content-Type: application/json
+
+{
+	"name": "Ken Carson Duplicate",
+	"country": "USA",
+	"debutYear": "2000-01-01",
+	"height": 1.8
+}
+
 ### GET this new artist
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
 
-### PATCH update artist
+### PATCH update artist (partial)
 PATCH http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
 Content-Type: application/json
 
@@ -92,18 +110,43 @@ Content-Type: application/json
 	"country": "UK"
 }
 
-### DELETE artist
+### DELETE artist (single)
 DELETE http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
 
+### DELETE all artists (collection)
+DELETE http://localhost:9080/music-app-advanced/api/artists
 
-### GET songs
-GET http://localhost:9080/music-app-advanced/api/songs
+### PUT replace entire artists collection
+PUT http://localhost:9080/music-app-advanced/api/artists
+Content-Type: application/json
 
-### GET song by id (example)
-GET http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000001
+[
+	{
+		"id": "22222222-2222-2222-2222-000000000001",
+		"name": "Lil Uzi Vert (updated)",
+		"country": "USA",
+		"debutYear": "1994-07-31",
+		"height": 1.73
+	},
+	{
+		"name": "New Artist Without Id",
+		"country": "Canada",
+		"debutYear": "1990-01-01",
+		"height": 1.65
+	}
+]
 
-### PUT create song
-PUT http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
+### GET songs by artist (list)
+GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs
+
+### GET song by id (existing under artist)
+GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000001
+
+### GET song by id (not found)
+GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/00000000-0000-0000-0000-000000000000
+
+### PUT create song under artist (single)
+PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
 Content-Type: application/json
 
 {
@@ -111,24 +154,57 @@ Content-Type: application/json
 	"genre": "HIPHOP",
 	"releaseYear": "2016-01-01",
 	"duration": 2.5,
-	"artistId": "22222222-2222-2222-2222-000000000001",
+	"userId": "11111111-1111-1111-1111-000000000001"
+}
+
+### PUT create song under non-existing artist (should return 404)
+PUT http://localhost:9080/music-app-advanced/api/artists/00000000-0000-0000-0000-000000000000/songs/33333333-3333-3333-3333-000000000010
+Content-Type: application/json
+
+{
+	"title": "Orphan Song",
+	"genre": "POP",
+	"releaseYear": "2020-01-01",
+	"duration": 3.0,
 	"userId": "11111111-1111-1111-1111-000000000001"
 }
 
 ### GET this new song
-GET http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
+GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
 
-### PATCH update song
-PATCH http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
+### PATCH update song (partial)
+PATCH http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
 Content-Type: application/json
 
 {
 	"title": "Updated Title",
-    "userId": "11111111-1111-1111-1111-000000000002"
+	"userId": "11111111-1111-1111-1111-000000000002"
 }
 
-### DELETE song
-DELETE http://localhost:9080/music-app-advanced/api/songs/33333333-3333-3333-3333-000000000009
+### DELETE song (single)
+DELETE http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
 
-### GET songs by artist
-GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs
+### DELETE all songs for an artist (collection)
+DELETE http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs
+
+### PUT replace all songs for an artist (collection)
+PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs
+Content-Type: application/json
+
+[
+	{
+		"id": "33333333-3333-3333-3333-000000000001",
+		"title": "You Was Right2",
+		"genre": "HIPHOP",
+		"releaseYear": "2016-01-01",
+		"duration": 3.5,
+		"userId": "11111111-1111-1111-1111-000000000001"
+	},
+	{
+		"title": "New Track Without Id",
+		"genre": "POP",
+		"releaseYear": "2024-01-01",
+		"duration": 2.9,
+		"userId": "11111111-1111-1111-1111-000000000002"
+	}
+]
