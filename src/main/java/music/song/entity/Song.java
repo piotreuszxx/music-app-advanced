@@ -26,7 +26,10 @@ public class Song implements Serializable {
     private UUID id;
 
     private String title;
+
+    @Enumerated(EnumType.STRING)
     private Genre genre;
+
     private LocalDate releaseYear;
     private double duration; // eg. 2.46
 

@@ -1,7 +1,7 @@
 
 package music.song.repository;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -11,11 +11,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@ApplicationScoped
+@RequestScoped
 public class SongRepository {
 
-    @PersistenceContext(unitName = "musicPU")
     private EntityManager em;
+
+    @PersistenceContext(unitName = "musicPU")
+    public void setEm(EntityManager em) {
+        this.em = em;
+    }
 
     public Optional<Song> find(UUID id) {
         return Optional.ofNullable(em.find(Song.class, id));
@@ -34,6 +38,7 @@ public class SongRepository {
 
     @Transactional
     public void create(Song song) {
+        if (song == null) return;
         em.persist(song);
     }
 

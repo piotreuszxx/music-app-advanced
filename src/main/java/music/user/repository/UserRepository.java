@@ -1,40 +1,57 @@
 
 package music.user.repository;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import music.user.entity.User;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-@ApplicationScoped
+@RequestScoped
 public class UserRepository {
 
-    private final Set<User> users = new HashSet<>();
+    private EntityManager em;
+
+    @PersistenceContext(unitName = "musicPU")
+    public void setEm(EntityManager em) {
+        this.em = em;
+    }
 
     public Optional<User> find(UUID id) {
-        return users.stream()
-                .filter(user -> user.getId().equals(id))
-                .findFirst();
+        return Optional.ofNullable(em.find(User.class, id));
     }
 
     public List<User> findAll() {
-        return new ArrayList<>(users);
+        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
 
+    public Optional<User> findByLogin(String login) {
+        var list = em.createQuery("SELECT u FROM User u WHERE u.login = :login", User.class)
+                .setParameter("login", login)
+                .getResultList();
+        if (list.isEmpty()) return Optional.empty();
+        return Optional.of(list.get(0));
+    }
+
+    @Transactional
     public void create(User user) {
-        if (users.stream().anyMatch(u -> u.getId().equals(user.getId()))) {
-            throw new IllegalArgumentException("User with id " + user.getId() + " already exists.");
-        }
-        users.add(user);
+        if (user == null) return;
+        em.persist(user);
     }
 
+    @Transactional
     public void update(User user) {
-        users.removeIf(u -> u.getId().equals(user.getId()));
-        users.add(user);
+        em.merge(user);
     }
 
+    @Transactional
     public void delete(User user) {
-        users.removeIf(u -> u.getId().equals(user.getId()));
+        User managed = em.contains(user) ? user : em.merge(user);
+        em.remove(managed);
     }
 
 }

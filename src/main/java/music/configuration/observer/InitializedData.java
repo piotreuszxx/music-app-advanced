@@ -54,6 +54,11 @@ public class InitializedData {
 
     @SneakyThrows
     private void initData() {
+        // if admin exists, assume DB already initialized -> skip seeding
+        if (userService.findByLogin("admin").isPresent()) {
+            System.out.println("[INFO] Data already initialized");
+            return;
+        }
         User admin = User.builder()
                 .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
                 .login("admin")

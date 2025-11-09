@@ -3,6 +3,8 @@ package music.user.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import music.user.entity.User;
 import music.user.repository.UserRepository;
 
@@ -13,12 +15,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
+@NoArgsConstructor(force = true)
 public class UserService {
 
     private UserRepository userRepository;
-
-    protected UserService() {
-    }
 
     @Inject
     public UserService(UserRepository userRepository) {
@@ -29,18 +29,25 @@ public class UserService {
         return userRepository.find(id);
     }
 
+    public Optional<User> findByLogin(String login) {
+        return userRepository.findByLogin(login);
+    }
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
+    @Transactional
     public void create(User user) {
         userRepository.create(user);
     }
 
+    @Transactional
     public void update(User user) {
         userRepository.update(user);
     }
 
+    @Transactional
     public void delete(UUID id) {
         userRepository.delete(userRepository.find(id).orElseThrow());
     }

@@ -7,5 +7,19 @@
         <feature>cdi-4.0</feature>
         <feature>faces-4.0</feature>
         <feature>restfulWS-3.1</feature>
+        <feature>persistence-3.1</feature>
     </featureManager>
+
+    <dataSource id="MusicDataSource" jndiName="jdbc/MusicDb">
+        <jdbcDriver javax.sql.XADataSource="org.h2.jdbcx.JdbcDataSource"
+                    javax.sql.ConnectionPoolDataSource="org.h2.jdbcx.JdbcDataSource"
+                    javax.sql.DataSource="org.h2.jdbcx.JdbcDataSource"
+                    libraryRef="H2JDBCLib"/>
+    <!-- Use TCP H2 server: Liberty will connect via TCP so an external H2 web console can attach -->
+    <properties URL="jdbc:h2:tcp://localhost/~/musicdb"/>
+    </dataSource>
+
+    <library id="H2JDBCLib">
+        <fileset dir="${wlp.install.dir}/usr/servers/defaultServer/lib/global/" includes="h2-2.2.220.jar"/>
+    </library>
 </server>

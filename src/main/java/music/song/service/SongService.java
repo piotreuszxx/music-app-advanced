@@ -3,34 +3,34 @@ package music.song.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import music.artist.entity.Artist;
-import music.artist.repository.ArtistRepository;
 import music.song.entity.Song;
 import music.song.repository.SongRepository;
 import music.song.dto.PutSongRequest;
 import music.song.dto.PatchSongRequest;
 import music.song.dto.GetSongResponse;
 import music.song.dto.GetSongsResponse;
+import music.artist.service.ArtistService;
 import music.user.entity.User;
-import music.user.repository.UserRepository;
+import music.user.service.UserService;
 
 import java.util.*;
 
 @ApplicationScoped
+@NoArgsConstructor(force = true)
 public class SongService {
 
     private SongRepository songRepository;
-    private ArtistRepository artistRepository;
-    private UserRepository userRepository;
-
-    protected SongService() {
-    }
+    private ArtistService artistService;
+    private UserService userService;
 
     @Inject
-    public SongService(SongRepository songRepository, ArtistRepository artistRepository, UserRepository userRepository) {
+    public SongService(SongRepository songRepository, ArtistService artistService, UserService userService) {
         this.songRepository = songRepository;
-        this.artistRepository = artistRepository;
-        this.userRepository = userRepository;
+        this.artistService = artistService;
+        this.userService = userService;
     }
 
     public Optional<Song> find(UUID id) {
@@ -53,32 +53,6 @@ public class SongService {
         return find(id).map(this::toFullDto);
     }
 
-    /**
-     * Check whether artist exists.
-     */
-    public boolean artistExists(UUID artistId) {
-        if (artistId == null) return false;
-        return artistRepository.find(artistId).isPresent();
-    }
-
-    public Optional<GetSongResponse> findDtoByArtist(UUID artistId, UUID songId) {
-        return findDto(songId).filter(dto -> dto.getArtistId() != null && dto.getArtistId().equals(artistId));
-    }
-
-    public boolean updateForArtist(UUID artistId, UUID songId, PatchSongRequest req) {
-        Optional<GetSongResponse> s = findDtoByArtist(artistId, songId);
-        if (s.isEmpty()) return false;
-        req.setArtistId(artistId);
-        return updatePartialWithLinks(req, songId);
-    }
-
-    public boolean deleteForArtist(UUID artistId, UUID songId) {
-        Optional<GetSongResponse> s = findDtoByArtist(artistId, songId);
-        if (s.isEmpty()) return false;
-        deleteWithUnlink(songId);
-        return true;
-    }
-
     private GetSongsResponse.Song toSmallDto(Song s) {
         var r = new GetSongsResponse.Song();
         r.setId(s.getId());
@@ -98,18 +72,22 @@ public class SongService {
         return r;
     }
 
+    @Transactional
     public void create(Song song) {
         songRepository.create(song);
     }
 
+    @Transactional
     public void update(Song song) {
         songRepository.update(song);
     }
 
+    @Transactional
     public void delete(UUID id) {
         songRepository.find(id).ifPresent(songRepository::delete);
     }
 
+    @Transactional
     public boolean createWithLinks(PutSongRequest request, UUID uuid) {
         if (songRepository.find(uuid).isPresent()) return false;
         Song song = Song.builder()
@@ -122,14 +100,14 @@ public class SongService {
 
         // attach artist object if provided
         if (request.getArtistId() != null) {
-            artistRepository.find(request.getArtistId()).ifPresent(artist -> {
+            artistService.find(request.getArtistId()).ifPresent(artist -> {
                 song.setArtist(artist);
             });
         }
 
         // attach user object if provided
         if (request.getUserId() != null) {
-            userRepository.find(request.getUserId()).ifPresent(user -> {
+            userService.find(request.getUserId()).ifPresent(user -> {
                 song.setUser(user);
             });
         }
@@ -142,7 +120,7 @@ public class SongService {
             var artist = song.getArtist();
             if (artist.getSongs() == null) artist.setSongs(new ArrayList<>());
             artist.getSongs().add(song);
-            artistRepository.update(artist);
+            artistService.update(artist);
         }
 
         // link to user (add Song object to user.songs)
@@ -150,7 +128,7 @@ public class SongService {
             var user = song.getUser();
             if (user.getSongs() == null) user.setSongs(new ArrayList<>());
             user.getSongs().add(song);
-            userRepository.update(user);
+            userService.update(user);
         }
 
         return true;
@@ -167,12 +145,12 @@ public class SongService {
                 var oldArtist = song.getArtist();
                 if (oldArtist != null) {
                     oldArtist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                    artistRepository.update(oldArtist);
+                    artistService.update(oldArtist);
                 }
-                artistRepository.find(request.getArtistId()).ifPresent(newArtist -> {
+                artistService.find(request.getArtistId()).ifPresent(newArtist -> {
                     if (newArtist.getSongs() == null) newArtist.setSongs(new ArrayList<>());
                     newArtist.getSongs().add(song);
-                    artistRepository.update(newArtist);
+                    artistService.update(newArtist);
                     song.setArtist(newArtist);
                 });
             }
@@ -182,12 +160,12 @@ public class SongService {
                 var oldUser = song.getUser();
                 if (oldUser != null) {
                     if (oldUser.getSongs() != null) oldUser.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                    userRepository.update(oldUser);
+                    userService.update(oldUser);
                 }
-                userRepository.find(request.getUserId()).ifPresent(newUser -> {
+                userService.find(request.getUserId()).ifPresent(newUser -> {
                     if (newUser.getSongs() == null) newUser.setSongs(new ArrayList<>());
                     newUser.getSongs().add(song);
-                    userRepository.update(newUser);
+                    userService.update(newUser);
                     song.setUser(newUser);
                 });
             }
@@ -204,11 +182,11 @@ public class SongService {
             User user = song.getUser();
             if (artist != null) {
                 if (artist.getSongs() != null) artist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                artistRepository.update(artist);
+                artistService.update(artist);
             }
             if (user != null) {
                 if (user.getSongs() != null) user.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                userRepository.update(user);
+                userService.update(user);
             }
             songRepository.delete(song);
         });
