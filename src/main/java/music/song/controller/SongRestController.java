@@ -33,6 +33,9 @@ public class SongRestController {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         List<GetSongsResponse.Song> list = songService.findByArtistDtos(artistId);
+        if(list.isEmpty()){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.ok(list).build();
     }
 
@@ -40,9 +43,9 @@ public class SongRestController {
     @Path("{id}")
     public Response getSongFromArtistById(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id) {
         Optional<GetSongResponse> s = songService.findDto(id);
-        if (s.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
+        if (s.isEmpty())
+            return Response.status(Response.Status.NOT_FOUND).build();
         GetSongResponse dto = s.get();
-        // ensure it belongs to the artist in path
         if (dto.getArtistId() == null || !dto.getArtistId().equals(artistId)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -51,36 +54,41 @@ public class SongRestController {
 
     @PUT
     @Path("{id}")
-    public Response createSong(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PutSongRequest req, @Context UriInfo uriInfo) {
+    public Response createSongForArtist(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PutSongRequest req, @Context UriInfo uriInfo) {
         if (artistService.find(artistId).isEmpty())
             return Response.status(Response.Status.NOT_FOUND).build();
-        // set artistId from path (ignore body artistId)
         req.setArtistId(artistId);
         boolean created_flag = songService.createWithLinks(req, id);
-        if (!created_flag) return Response.status(Response.Status.CONFLICT).entity("Song already exists").build();
+        if (!created_flag)
+            return Response.status(Response.Status.CONFLICT).entity("Song already exists").build();
         URI created = uriInfo.getAbsolutePath();
         return Response.created(created).build();
     }
 
     @PATCH
     @Path("{id}")
-    public Response updateSong(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PatchSongRequest req) {
+    public Response updateSongByArtist(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PatchSongRequest req) {
         Optional<GetSongResponse> s = songService.findDto(id);
-        if (s.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
+        if (s.isEmpty())
+            return Response.status(Response.Status.NOT_FOUND).build();
         if (s.get().getArtistId() == null || !s.get().getArtistId().equals(artistId))
             return Response.status(Response.Status.NOT_FOUND).build();
-        // don't allow artist in body to override path (but service will re-link only if artistId provided)
         req.setArtistId(artistId);
-        boolean ok = songService.updatePartialWithLinks(req, id);
-        return ok ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
+        boolean updated_flag = songService.updatePartialWithLinks(req, id);
+        if(!updated_flag)
+            return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.noContent().build();
+
     }
 
     @DELETE
     @Path("{id}")
     public Response deleteSong(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id) {
         Optional<GetSongResponse> s = songService.findDto(id);
-        if (s.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
-        if (s.get().getArtistId() == null || !s.get().getArtistId().equals(artistId)) return Response.status(Response.Status.NOT_FOUND).build();
+        if (s.isEmpty())
+            return Response.status(Response.Status.NOT_FOUND).build();
+        if (s.get().getArtistId() == null || !s.get().getArtistId().equals(artistId))
+            return Response.status(Response.Status.NOT_FOUND).build();
         songService.deleteWithUnlink(id);
         return Response.noContent().build();
     }
@@ -90,53 +98,10 @@ public class SongRestController {
         if (artistService.find(artistId).isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        songService.deleteByArtist(artistId);
-        return Response.noContent().build();
-    }
-
-    @PUT
-    public Response replaceAllSongsForArtist(@PathParam("artistId") UUID artistId, List<PutSongWithId> incoming) {
-        if (artistService.find(artistId).isEmpty()) {
+        if(songService.findByArtistDtos(artistId).isEmpty()){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-
-        // existing song ids for artist
-        List<GetSongsResponse.Song> existing = songService.findByArtistDtos(artistId);
-        Set<UUID> existingIds = new HashSet<>();
-        for (GetSongsResponse.Song s : existing)
-        {
-            if (s.getId() != null)
-                existingIds.add(s.getId());
-        }
-
-        Set<UUID> incomingIds = new HashSet<>();
-
-        for (PutSongWithId p : incoming) {
-            UUID id = p.getId() == null ? UUID.randomUUID() : p.getId(); // create new uuid for song, probably should not be null
-            incomingIds.add(id);
-
-            // build PutSongRequest
-            PutSongRequest req = PutSongRequest.builder()
-                    .title(p.getTitle())
-                    .genre(p.getGenre())
-                    .releaseYear(p.getReleaseYear())
-                    .duration(p.getDuration())
-                    .artistId(artistId)
-                    .userId(p.getUserId())
-                    .build();
-
-            // if exists -> remove and recreate to ensure full replace semantics
-            if (songService.find(id).isPresent()) {
-                songService.deleteWithUnlink(id);
-            }
-            songService.createWithLinks(req, id);
-        }
-
-        // delete remaining existing songs not present in incoming
-        for (UUID ex : existingIds) {
-            if (!incomingIds.contains(ex)) songService.deleteWithUnlink(ex);
-        }
-
+        songService.deleteByArtist(artistId);
         return Response.noContent().build();
     }
 }

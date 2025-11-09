@@ -148,6 +148,14 @@ public class InitializedData {
         // initialize and persist songs (use service to maintain relations)
         songService.createWithLinks(new PutSongRequest("You Was Right", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000001"));
         songService.createWithLinks(new PutSongRequest("Stay", Genre.POP, LocalDate.of(2021, 1, 1), 2.7, artist2.getId(), nicole.getId()), UUID.fromString("33333333-3333-3333-3333-000000000002"));
+
+        songService.createWithLinks(new PutSongRequest("Of Course", Genre.HIPHOP, LocalDate.of(2018, 1, 1), 3.3, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000003"));
+        songService.createWithLinks(new PutSongRequest("Do What I Want", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000004"));
+
+        songService.createWithLinks(new PutSongRequest("Maybe", Genre.HIPHOP, LocalDate.of(2020, 1, 1), 3.5, artist2.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000005"));
+
+
+
     }
 
     private Path getAvatarDirPath() {

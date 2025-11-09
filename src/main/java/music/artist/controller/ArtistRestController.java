@@ -32,15 +32,21 @@ public class ArtistRestController {
     SongService songService;
 
     @GET
-    public List<GetArtistsResponse.Artist> getAllArtists() {
-        return artistService.findAllDtos();
+    public Response getAllArtists() {
+        List<GetArtistsResponse.Artist> all = artistService.findAllDtos();
+        if(all.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(all).build();
     }
 
     @GET
     @Path("{id}")
     public Response getArtist(@PathParam("id") UUID id) {
         Optional<GetArtistResponse> dto = artistService.findDto(id);
-        return dto.map(d -> Response.ok(d).build()).orElse(Response.status(Response.Status.NOT_FOUND).build());
+        if(dto.isEmpty())
+            return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(dto).build();
     }
 
     @PUT
@@ -88,56 +94,17 @@ public class ArtistRestController {
     }
 
     @DELETE
-    public Response deleteAllArtists_withSongs() {
+    public Response deleteAllArtistsWithSongs() {
         List<Artist> all = artistService.findAll();
+        if(all.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         for (Artist a : all) {
             if (a.getId() != null) {
                 songService.deleteByArtist(a.getId());
                 artistService.delete(a.getId());
             }
         }
-        return Response.noContent().build();
-    }
-
-    @PUT
-    public Response replaceAllArtists(List<GetArtistResponse> incoming) {
-        Set<UUID> incomingIds = new HashSet<>();
-        for (GetArtistResponse g : incoming) {
-            UUID id = g.getId();
-            if (id == null) id = UUID.randomUUID();
-            incomingIds.add(id);
-
-            if (artistService.find(id).isPresent()) {
-                // update existing
-                artistService.find(id).ifPresent(existing -> {
-                    existing.setName(g.getName());
-                    existing.setCountry(g.getCountry());
-                    existing.setDebutYear(g.getDebutYear());
-                    existing.setHeight(g.getHeight() == null ? 0.0 : g.getHeight());
-                    artistService.update(existing);
-                });
-            } else {
-                // create new
-                Artist a = Artist.builder()
-                        .id(id)
-                        .name(g.getName())
-                        .country(g.getCountry())
-                        .debutYear(g.getDebutYear())
-                        .height(g.getHeight() == null ? 0.0 : g.getHeight())
-                        .build();
-                artistService.create(a);
-            }
-        }
-
-        // delete artists not in incoming
-        List<Artist> existing = artistService.findAll();
-        for (Artist a : existing) {
-            if (a.getId() != null && !incomingIds.contains(a.getId())) {
-                songService.deleteByArtist(a.getId());
-                artistService.delete(a.getId());
-            }
-        }
-
         return Response.noContent().build();
     }
 }
