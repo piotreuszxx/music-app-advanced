@@ -13,7 +13,6 @@ import music.artist.dto.GetArtistsResponse;
 import music.artist.dto.PatchArtistRequest;
 import music.artist.dto.PutArtistRequest;
 import music.artist.service.ArtistService;
-import music.song.service.SongService;
 import music.artist.entity.Artist;
 
 import java.net.URI;
@@ -28,8 +27,6 @@ public class ArtistRestController {
     @Inject
     ArtistService artistService;
 
-    @Inject
-    SongService songService;
 
     @GET
     public Response getAllArtists() {
@@ -46,23 +43,14 @@ public class ArtistRestController {
         Optional<GetArtistResponse> dto = artistService.findDto(id);
         if(dto.isEmpty())
             return Response.status(Response.Status.NOT_FOUND).build();
-        return Response.ok(dto).build();
+        return Response.ok(dto.get()).build();
     }
 
     @PUT
     @Path("{id}")
     public Response createArtist(@PathParam("id") UUID id, PutArtistRequest req, @Context UriInfo uriInfo) {
-        if (artistService.find(id).isPresent()) {
-            return Response.status(Response.Status.CONFLICT).entity("Artist already exists").build();
-        }
-        Artist a = Artist.builder()
-                .id(id)
-                .name(req.getName())
-                .country(req.getCountry())
-                .debutYear(req.getDebutYear())
-                .height(req.getHeight())
-                .build();
-        artistService.create(a);
+        boolean created_flag = artistService.createIfNotExists(id, req);
+        if (!created_flag) return Response.status(Response.Status.CONFLICT).entity("Artist already exists").build();
         URI created = uriInfo.getAbsolutePath();
         return Response.created(created).build();
     }
@@ -70,41 +58,21 @@ public class ArtistRestController {
     @PATCH
     @Path("{id}")
     public Response updateArtist(@PathParam("id") UUID id, PatchArtistRequest req) {
-        boolean ok = artistService.find(id).map(artist -> {
-            if (req.getName() != null) artist.setName(req.getName());
-            if (req.getCountry() != null) artist.setCountry(req.getCountry());
-            if (req.getDebutYear() != null) artist.setDebutYear(req.getDebutYear());
-            if (req.getHeight() != null) artist.setHeight(req.getHeight());
-            artistService.update(artist);
-            return true;
-        }).orElse(false);
+        boolean ok = artistService.patchArtist(id, req);
         return ok ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @DELETE
     @Path("{id}")
     public Response deleteArtist(@PathParam("id") UUID id) {
-        if (artistService.find(id).isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        // delete songs first, then artist
-        songService.deleteByArtist(id);
-        artistService.delete(id);
-        return Response.noContent().build();
+        boolean deleted = artistService.deleteArtistWithSongs(id);
+        return deleted ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @DELETE
     public Response deleteAllArtistsWithSongs() {
-        List<Artist> all = artistService.findAll();
-        if(all.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        for (Artist a : all) {
-            if (a.getId() != null) {
-                songService.deleteByArtist(a.getId());
-                artistService.delete(a.getId());
-            }
-        }
+        int deleted = artistService.deleteAllArtistsWithSongs();
+        if (deleted == 0) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();
     }
 }

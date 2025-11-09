@@ -2,46 +2,49 @@
 package music.song.repository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import music.song.entity.Song;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class SongRepository {
 
-    private final Set<Song> songs = new HashSet<>();
+    @PersistenceContext(unitName = "musicPU")
+    private EntityManager em;
 
     public Optional<Song> find(UUID id) {
-        return songs.stream()
-                .filter(s -> s.getId().equals(id))
-                .findFirst();
+        return Optional.ofNullable(em.find(Song.class, id));
     }
 
     public List<Song> findAll() {
-        return new ArrayList<>(songs);
+        return em.createQuery("SELECT s FROM Song s", Song.class).getResultList();
     }
 
     public List<Song> findByArtist(UUID artistId) {
         if (artistId == null) return List.of();
-        return songs.stream()
-                .filter(s -> s.getArtist() != null && artistId.equals(s.getArtist().getId()))
-                .toList();
+        return em.createQuery("SELECT s FROM Song s WHERE s.artist.id = :aid", Song.class)
+                .setParameter("aid", artistId)
+                .getResultList();
     }
 
+    @Transactional
     public void create(Song song) {
-        if (songs.stream().anyMatch(s -> s.getId().equals(song.getId()))) {
-            throw new IllegalArgumentException("Song with id " + song.getId() + " already exists.");
-            // this shouldnt happen
-        }
-        songs.add(song);
+        em.persist(song);
     }
 
+    @Transactional
     public void update(Song song) {
-        songs.removeIf(s -> s.getId().equals(song.getId()));
-        songs.add(song);
+        em.merge(song);
     }
 
+    @Transactional
     public void delete(Song song) {
-        songs.removeIf(s -> s.getId().equals(song.getId()));
+        Song managed = em.contains(song) ? song : em.merge(song);
+        em.remove(managed);
     }
 }

@@ -10,7 +10,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import music.song.dto.*;
 import music.song.service.SongService;
-import music.artist.service.ArtistService;
 
 import java.net.URI;
 import java.util.*;
@@ -24,12 +23,9 @@ public class SongRestController {
     @Inject
     SongService songService;
 
-    @Inject
-    ArtistService artistService;
-
     @GET
     public Response getAllSongsFromArtist(@PathParam("artistId") UUID artistId) {
-        if (artistService.find(artistId).isEmpty()) {
+        if (!songService.artistExists(artistId)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         List<GetSongsResponse.Song> list = songService.findByArtistDtos(artistId);
@@ -42,20 +38,15 @@ public class SongRestController {
     @GET
     @Path("{id}")
     public Response getSongFromArtistById(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id) {
-        Optional<GetSongResponse> s = songService.findDto(id);
-        if (s.isEmpty())
-            return Response.status(Response.Status.NOT_FOUND).build();
-        GetSongResponse dto = s.get();
-        if (dto.getArtistId() == null || !dto.getArtistId().equals(artistId)) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(dto).build();
+        Optional<GetSongResponse> s = songService.findDtoByArtist(artistId, id);
+        if (s.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(s.get()).build();
     }
 
     @PUT
     @Path("{id}")
     public Response createSongForArtist(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PutSongRequest req, @Context UriInfo uriInfo) {
-        if (artistService.find(artistId).isEmpty())
+        if (!songService.artistExists(artistId))
             return Response.status(Response.Status.NOT_FOUND).build();
         req.setArtistId(artistId);
         boolean created_flag = songService.createWithLinks(req, id);
@@ -68,15 +59,8 @@ public class SongRestController {
     @PATCH
     @Path("{id}")
     public Response updateSongByArtist(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PatchSongRequest req) {
-        Optional<GetSongResponse> s = songService.findDto(id);
-        if (s.isEmpty())
-            return Response.status(Response.Status.NOT_FOUND).build();
-        if (s.get().getArtistId() == null || !s.get().getArtistId().equals(artistId))
-            return Response.status(Response.Status.NOT_FOUND).build();
-        req.setArtistId(artistId);
-        boolean updated_flag = songService.updatePartialWithLinks(req, id);
-        if(!updated_flag)
-            return Response.status(Response.Status.NOT_FOUND).build();
+        boolean updated_flag = songService.updateForArtist(artistId, id, req);
+        if(!updated_flag) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();
 
     }
@@ -84,18 +68,14 @@ public class SongRestController {
     @DELETE
     @Path("{id}")
     public Response deleteSong(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id) {
-        Optional<GetSongResponse> s = songService.findDto(id);
-        if (s.isEmpty())
-            return Response.status(Response.Status.NOT_FOUND).build();
-        if (s.get().getArtistId() == null || !s.get().getArtistId().equals(artistId))
-            return Response.status(Response.Status.NOT_FOUND).build();
-        songService.deleteWithUnlink(id);
+        boolean deleted = songService.deleteForArtist(artistId, id);
+        if (!deleted) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();
     }
 
     @DELETE
     public Response deleteAllForArtist(@PathParam("artistId") UUID artistId) {
-        if (artistService.find(artistId).isEmpty()) {
+        if (!songService.artistExists(artistId)) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if(songService.findByArtistDtos(artistId).isEmpty()){
