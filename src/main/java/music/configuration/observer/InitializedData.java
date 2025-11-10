@@ -27,24 +27,29 @@ import java.util.UUID;
 @ApplicationScoped
 public class InitializedData {
 
-    @Inject
-    private UserService userService;
+    private final UserService userService;
+    private final ArtistService artistService;
+    private final SongService songService;
+    private final RequestContextController requestContextController;
+    private final ServletContext servletContext;
 
     @Inject
-    private ArtistService artistService;
-
-    @Inject
-    private SongService songService;
-
-    @Inject
-    private ServletContext servletContext;
-
-    @Inject
-    private RequestContextController requestContextController;
+    public InitializedData(UserService userService,
+                           ArtistService artistService,
+                           SongService songService,
+                           RequestContextController requestContextController,
+                           ServletContext servletContext) {
+        this.userService = userService;
+        this.artistService = artistService;
+        this.songService = songService;
+        this.requestContextController = requestContextController;
+        this.servletContext = servletContext;
+    }
 
     public void onStart(@Observes @Initialized(ApplicationScoped.class) Object init) {
         // activate request context because some beans (controllers) are request-scoped
         boolean activated = requestContextController.activate();
+        System.out.println("[INFO] context activated: " + activated);
         try {
             initData();
         } finally {
@@ -129,6 +134,7 @@ public class InitializedData {
         persistAvatarFile(ryan);
         userService.create(bezprof);
         persistAvatarFile(bezprof);
+        System.out.println("[INFO] Users initialized");
 
         // initialize artists
         Artist artist1 = Artist.builder()
@@ -149,6 +155,7 @@ public class InitializedData {
 
         artistService.create(artist1);
         artistService.create(artist2);
+        System.out.println("[INFO] Artists initialized");
 
         // initialize and persist songs (use service to maintain relations)
         songService.createWithLinks(new PutSongRequest("You Was Right", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000001"));
@@ -157,7 +164,8 @@ public class InitializedData {
         songService.createWithLinks(new PutSongRequest("Of Course", Genre.HIPHOP, LocalDate.of(2018, 1, 1), 3.3, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000003"));
         songService.createWithLinks(new PutSongRequest("Do What I Want", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000004"));
 
-        songService.createWithLinks(new PutSongRequest("Maybe", Genre.HIPHOP, LocalDate.of(2020, 1, 1), 3.5, artist2.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000005"));
+        songService.createWithLinks(new PutSongRequest("Maybe", Genre.POP, LocalDate.of(2020, 1, 1), 3.5, artist2.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000005"));
+        System.out.println("[INFO] Songs initialized");
 
 
 

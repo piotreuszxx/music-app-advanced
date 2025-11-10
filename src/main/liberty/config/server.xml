@@ -15,8 +15,10 @@
                     javax.sql.ConnectionPoolDataSource="org.h2.jdbcx.JdbcDataSource"
                     javax.sql.DataSource="org.h2.jdbcx.JdbcDataSource"
                     libraryRef="H2JDBCLib"/>
-    <!-- Use TCP H2 server: Liberty will connect via TCP so an external H2 web console can attach -->
-    <properties URL="jdbc:h2:tcp://localhost/~/musicdb"/>
+        <properties URL="jdbc:h2:mem:musicdb"/>
+        <!-- for tests with server based h2 db
+        <properties URL="jdbc:h2:tcp://localhost/~/musicdb"/>
+        -->
     </dataSource>
 
     <library id="H2JDBCLib">
