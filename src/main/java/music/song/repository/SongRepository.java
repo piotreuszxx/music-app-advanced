@@ -37,7 +37,6 @@ public class SongRepository {
     }
 
     public void create(Song song) {
-        if (song == null) return;
         em.persist(song);
     }
 
@@ -46,7 +45,6 @@ public class SongRepository {
     }
 
     public void delete(Song song) {
-        Song managed = em.contains(song) ? song : em.merge(song);
-        em.remove(managed);
+        em.remove(em.find(Song.class, song.getId()));
     }
 }

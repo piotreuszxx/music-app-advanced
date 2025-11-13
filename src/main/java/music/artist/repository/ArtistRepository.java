@@ -30,7 +30,6 @@ public class ArtistRepository {
     }
 
     public void create(Artist artist) {
-        if (artist == null) return;
         em.persist(artist);
     }
 
@@ -39,7 +38,6 @@ public class ArtistRepository {
     }
 
     public void delete(Artist artist) {
-        Artist managed = em.contains(artist) ? artist : em.merge(artist);
-        em.remove(managed);
+        em.remove(em.find(Artist.class, artist.getId()));
     }
 }

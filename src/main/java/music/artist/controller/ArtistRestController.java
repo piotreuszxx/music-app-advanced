@@ -88,7 +88,7 @@ public class ArtistRestController {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         // delete songs first, then artist
-        songService.deleteByArtist(id);
+        //songService.deleteByArtist(id); // now handled by cascading with JPA
         artistService.delete(id);
         return Response.noContent().build();
     }
@@ -101,7 +101,7 @@ public class ArtistRestController {
         }
         for (Artist a : all) {
             if (a.getId() != null) {
-                songService.deleteByArtist(a.getId());
+                //songService.deleteByArtist(a.getId()); // now handled by cascading with JPA
                 artistService.delete(a.getId());
             }
         }
