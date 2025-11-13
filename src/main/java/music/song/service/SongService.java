@@ -134,6 +134,7 @@ public class SongService {
         return true;
     }
 
+    @Transactional
     public boolean updatePartialWithLinks(PatchSongRequest request, UUID uuid) {
         return songRepository.find(uuid).map(song -> {
             if (request.getTitle() != null) song.setTitle(request.getTitle());
@@ -175,6 +176,7 @@ public class SongService {
         }).orElse(false);
     }
 
+    @Transactional
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
             // System.out.println("[DEBUG] SongService.deleteWithUnlink: deleting song " + uuid);
@@ -192,6 +194,7 @@ public class SongService {
         });
     }
 
+    @Transactional
     public void deleteByArtist(UUID artistId) {
         if (artistId == null) return;
         var songs = findByArtist(artistId);

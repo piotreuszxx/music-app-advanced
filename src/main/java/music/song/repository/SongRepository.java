@@ -36,18 +36,15 @@ public class SongRepository {
                 .getResultList();
     }
 
-    @Transactional
     public void create(Song song) {
         if (song == null) return;
         em.persist(song);
     }
 
-    @Transactional
     public void update(Song song) {
         em.merge(song);
     }
 
-    @Transactional
     public void delete(Song song) {
         Song managed = em.contains(song) ? song : em.merge(song);
         em.remove(managed);

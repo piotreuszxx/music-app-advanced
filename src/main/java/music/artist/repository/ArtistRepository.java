@@ -29,18 +29,15 @@ public class ArtistRepository {
         return em.createQuery("SELECT a FROM Artist a", Artist.class).getResultList();
     }
 
-    @Transactional
     public void create(Artist artist) {
         if (artist == null) return;
         em.persist(artist);
     }
 
-    @Transactional
     public void update(Artist artist) {
         em.merge(artist);
     }
 
-    @Transactional
     public void delete(Artist artist) {
         Artist managed = em.contains(artist) ? artist : em.merge(artist);
         em.remove(managed);
