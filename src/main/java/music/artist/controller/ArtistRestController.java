@@ -13,7 +13,6 @@ import music.artist.dto.GetArtistsResponse;
 import music.artist.dto.PatchArtistRequest;
 import music.artist.dto.PutArtistRequest;
 import music.artist.service.ArtistService;
-import music.song.service.SongService;
 import music.artist.entity.Artist;
 
 import java.net.URI;
@@ -27,9 +26,6 @@ public class ArtistRestController {
 
     @Inject
     ArtistService artistService;
-
-    @Inject
-    SongService songService;
 
     @GET
     public Response getAllArtists() {
@@ -87,8 +83,6 @@ public class ArtistRestController {
         if (artistService.find(id).isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        // delete songs first, then artist
-        //songService.deleteByArtist(id); // now handled by cascading with JPA
         artistService.delete(id);
         return Response.noContent().build();
     }
@@ -101,7 +95,6 @@ public class ArtistRestController {
         }
         for (Artist a : all) {
             if (a.getId() != null) {
-                //songService.deleteByArtist(a.getId()); // now handled by cascading with JPA
                 artistService.delete(a.getId());
             }
         }

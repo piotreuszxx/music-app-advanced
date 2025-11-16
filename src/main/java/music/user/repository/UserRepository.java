@@ -37,18 +37,15 @@ public class UserRepository {
         return Optional.of(list.get(0));
     }
 
-    @Transactional
     public void create(User user) {
         if (user == null) return;
         em.persist(user);
     }
 
-    @Transactional
     public void update(User user) {
         em.merge(user);
     }
 
-    @Transactional
     public void delete(User user) {
         User managed = em.contains(user) ? user : em.merge(user);
         em.remove(managed);

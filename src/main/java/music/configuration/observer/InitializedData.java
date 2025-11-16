@@ -13,7 +13,6 @@ import music.user.entity.User;
 import music.user.service.UserService;
 import music.artist.entity.Artist;
 import music.artist.service.ArtistService;
-import music.song.entity.Song;
 import music.song.entity.Genre;
 import music.song.service.SongService;
 
@@ -173,9 +172,12 @@ public class InitializedData {
 
     private Path getAvatarDirPath() {
         String avatarParam = servletContext.getInitParameter("avatarDir");
-        String base = servletContext.getRealPath("/");
-        if (base == null) base = System.getProperty("java.io.tmpdir");
-        return Path.of(base, avatarParam);
+        if (avatarParam == null || avatarParam.isBlank()) {
+            throw new IllegalStateException("Context param 'avatarDir' must be defined in web.xml and point to avatar directory");
+        }
+        Path p = Path.of(avatarParam);
+        if (!p.isAbsolute()) p = Path.of(System.getProperty("user.dir")).resolve(p);
+        return p;
     }
 
     private byte[] readAvatar(String fileName) {

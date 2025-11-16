@@ -39,9 +39,12 @@ public class UserController {
 
     private Path getAvatarDirPath() {
         String avatarParam = servletContext.getInitParameter("avatarDir");
-        String base = servletContext.getRealPath("/");
-        if (base == null) base = System.getProperty("java.io.tmpdir");
-        return Path.of(base, avatarParam);
+        if (avatarParam == null || avatarParam.isBlank()) {
+            throw new IllegalStateException("Context param 'avatarDir' must be defined in web.xml and point to avatar directory");
+        }
+        Path p = Path.of(avatarParam);
+        if (!p.isAbsolute()) p = Path.of(System.getProperty("user.dir")).resolve(p);
+        return p;
     }
 
     public GetUserResponse getUser(UUID uuid) {
