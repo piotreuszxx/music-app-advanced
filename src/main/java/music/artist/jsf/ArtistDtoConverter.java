@@ -1,10 +1,10 @@
 package music.artist.jsf;
 
+import jakarta.ejb.EJB;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
-import jakarta.inject.Inject;
 import music.artist.dto.GetArtistsResponse;
 import music.artist.service.ArtistService;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
 @FacesConverter(value = "artistDtoConverter", managed = true)
 public class ArtistDtoConverter implements Converter<GetArtistsResponse.Artist> {
 
-    @Inject
+    @EJB
     ArtistService artistService;
 
     @Override

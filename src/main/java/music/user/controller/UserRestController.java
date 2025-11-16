@@ -1,7 +1,7 @@
 package music.user.controller;
 
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import jakarta.servlet.ServletException;
@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequestScoped
 public class UserRestController {
 
-    @Inject
+    @EJB
     UserService userService;
 
     @GET

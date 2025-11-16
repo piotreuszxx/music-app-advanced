@@ -1,11 +1,13 @@
 package music.configuration.observer;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
-import jakarta.enterprise.context.control.RequestContextController;
-import jakarta.enterprise.context.Initialized;
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.Singleton;
+import jakarta.ejb.Startup;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.inject.Inject;
-import jakarta.servlet.ServletContext;
+import jakarta.annotation.Resource;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import music.song.dto.PutSongRequest;
 import music.user.entity.Role;
@@ -17,45 +19,39 @@ import music.song.entity.Genre;
 import music.song.service.SongService;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@ApplicationScoped
+@Singleton
+@Startup
+@TransactionAttribute(value = TransactionAttributeType.NOT_SUPPORTED)
+@NoArgsConstructor
 public class InitializedData {
 
-    private final UserService userService;
-    private final ArtistService artistService;
-    private final SongService songService;
-    private final RequestContextController requestContextController;
-    private final ServletContext servletContext;
+    private UserService userService;
+    private ArtistService artistService;
+    private SongService songService;
+
+    @Resource(name = "avatarDir")
+    private String avatarDir;
+
+    @Resource(name = "avatarInitDir")
+    private String avatarInitDir;
 
     @Inject
     public InitializedData(UserService userService,
                            ArtistService artistService,
-                           SongService songService,
-                           RequestContextController requestContextController,
-                           ServletContext servletContext) {
+                           SongService songService) {
         this.userService = userService;
         this.artistService = artistService;
         this.songService = songService;
-        this.requestContextController = requestContextController;
-        this.servletContext = servletContext;
     }
 
-    public void onStart(@Observes @Initialized(ApplicationScoped.class) Object init) {
-        // activate request context because some beans (controllers) are request-scoped
-        boolean activated = requestContextController.activate();
-        System.out.println("[INFO] context activated: " + activated);
-        try {
-            initData();
-        } finally {
-            if (activated) requestContextController.deactivate();
-        }
-    }
-
+    @PostConstruct
     @SneakyThrows
     private void initData() {
         // if admin exists, assume DB already initialized -> skip seeding
@@ -72,7 +68,7 @@ public class InitializedData {
                 .email("admin@simplerpg.example.com")
                 .password("admin123")
                 .roles(List.of(Role.ADMIN, Role.USER))
-                .avatar(readAvatar("admin.png"))
+                .avatar(getResourceAsByteArray("admin.png"))
                 .build();
 
         User piotr = User.builder()
@@ -84,7 +80,7 @@ public class InitializedData {
                 .email("piotreusz@gmail.com")
                 .password("piotr123")
                 .roles(List.of(Role.USER))
-                .avatar(readAvatar("piotreusz.png"))
+                .avatar(getResourceAsByteArray("piotreusz.png"))
                 .build();
 
         User nicole = User.builder()
@@ -96,7 +92,7 @@ public class InitializedData {
                 .email("nicolele@gmail.com")
                 .password("nicole123")
                 .roles(List.of(Role.USER))
-                .avatar(readAvatar("nicole.png"))
+                .avatar(getResourceAsByteArray("nicole.png"))
                 .build();
 
         User ryan = User.builder()
@@ -108,7 +104,7 @@ public class InitializedData {
                 .email("driver@gmail.com")
                 .password("driver123")
                 .roles(List.of(Role.USER))
-                .avatar(readAvatar("ryan.png"))
+                .avatar(getResourceAsByteArray("ryan.png"))
                 .build();
 
         User bezprof = User.builder()
@@ -170,31 +166,22 @@ public class InitializedData {
 
     }
 
-    private Path getAvatarInitDirPath() {
-        String avatarParam = servletContext.getInitParameter("avatarDir");
-        String base = servletContext.getRealPath("/");
-        if (base == null) base = System.getProperty("java.io.tmpdir");
-        return Path.of(base, avatarParam);
-    }
-
     private Path getAvatarServerDirPath() {
-        String serverWorkDir = System.getProperty("user.dir"); // defaultServer/
-        String avatarsFolder = servletContext.getInitParameter("avatarDir"); // "avatars"
+        // Persist avatars to the server working directory (defaultServer)
+        String serverWorkDir = System.getProperty("user.dir");
+        String avatarsFolder = avatarDir;
         return Path.of(serverWorkDir, avatarsFolder);
     }
 
-    private byte[] readAvatar(String fileName) {
-        try {
-            Path dir = getAvatarInitDirPath();
-            Path avatarPath = dir.resolve(fileName);
-            if (Files.exists(avatarPath)) {
-                return Files.readAllBytes(avatarPath);
-            } else {
-                System.err.println("[WARN] Avatar file not found: " + avatarPath);
-                return null;
+    private byte[] getResourceAsByteArray(String fileName) {
+        String path = "/" + avatarInitDir + "/" + fileName;
+        try (InputStream is = getClass().getResourceAsStream(path)) {
+            if (is == null) {
+                throw new IllegalStateException("Resource not found: " + path);
             }
+            return is.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException("Error reading avatar " + fileName, e);
+            throw new RuntimeException(e);
         }
     }
 

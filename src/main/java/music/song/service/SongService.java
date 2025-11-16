@@ -1,9 +1,10 @@
 
 package music.song.service;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import music.artist.entity.Artist;
 import music.song.entity.Song;
 import music.song.repository.SongRepository;
@@ -17,15 +18,14 @@ import music.user.service.UserService;
 
 import java.util.*;
 
-@ApplicationScoped
+@LocalBean
+@Stateless
+@NoArgsConstructor(force = true)
 public class SongService {
 
-    private SongRepository songRepository;
-    private ArtistService artistService;
-    private UserService userService;
-
-    protected SongService() {
-    }
+    private final SongRepository songRepository;
+    private final ArtistService artistService;
+    private final UserService userService;
 
     @Inject
     public SongService(SongRepository songRepository, ArtistService artistService, UserService userService) {
@@ -73,22 +73,18 @@ public class SongService {
         return r;
     }
 
-    @Transactional
     public void create(Song song) {
         songRepository.create(song);
     }
 
-    @Transactional
     public void update(Song song) {
         songRepository.update(song);
     }
 
-    @Transactional
     public void delete(UUID id) {
         songRepository.find(id).ifPresent(songRepository::delete);
     }
 
-    @Transactional
     public boolean createWithLinks(PutSongRequest request, UUID uuid) {
         if (songRepository.find(uuid).isPresent()) return false;
         Song song = Song.builder()
@@ -135,7 +131,6 @@ public class SongService {
         return true;
     }
 
-    @Transactional
     public boolean updatePartialWithLinks(PatchSongRequest request, UUID uuid) {
         return songRepository.find(uuid).map(song -> {
             if (request.getTitle() != null) song.setTitle(request.getTitle());
@@ -177,7 +172,6 @@ public class SongService {
         }).orElse(false);
     }
 
-    @Transactional
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
             // System.out.println("[DEBUG] SongService.deleteWithUnlink: deleting song " + uuid);
@@ -195,7 +189,6 @@ public class SongService {
         });
     }
 
-    @Transactional
     public void deleteByArtist(UUID artistId) {
         if (artistId == null) return;
         var songs = findByArtist(artistId);

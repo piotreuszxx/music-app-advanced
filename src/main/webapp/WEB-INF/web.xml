@@ -5,10 +5,17 @@
          version="6.0"
          metadata-complete="false">
 
-    <context-param>
-        <param-name>avatarDir</param-name>
-        <param-value>avatars</param-value>
-    </context-param>
+    <env-entry>
+        <env-entry-name>avatarDir</env-entry-name>
+        <env-entry-type>java.lang.String</env-entry-type>
+        <env-entry-value>avatars</env-entry-value>
+    </env-entry>
+
+    <env-entry>
+        <env-entry-name>avatarInitDir</env-entry-name>
+        <env-entry-type>java.lang.String</env-entry-type>
+        <env-entry-value>avatars_for_init</env-entry-value>
+    </env-entry>
 
     <context-param>
         <param-name>jakarta.faces.FACELETS_SKIP_COMMENTS</param-name>

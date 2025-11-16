@@ -1,6 +1,6 @@
 package music.song.jsf;
 
-import jakarta.inject.Inject;
+import jakarta.ejb.EJB;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import lombok.Getter;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import music.song.dto.GetSongResponse;
 import music.song.entity.Genre;
 import music.song.service.SongService;
 import music.artist.service.ArtistService;
@@ -28,10 +29,10 @@ public class SongFormBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
+    @EJB
     SongService songService;
 
-    @Inject
+    @EJB
     ArtistService artistService;
 
     private String id; // preselected song id, from viewParam, for editing
@@ -42,9 +43,9 @@ public class SongFormBean implements Serializable {
         if (id != null && !id.isBlank()) {
             try {
                 UUID uuid = UUID.fromString(id);
-                Optional<music.song.dto.GetSongResponse> s = songService.findDto(uuid);
+                Optional<GetSongResponse> s = songService.findDto(uuid);
                 if (s.isPresent()) {
-                    music.song.dto.GetSongResponse dto = s.get();
+                    GetSongResponse dto = s.get();
                     song.setId(dto.getId());
                     song.setTitle(dto.getTitle());
                     song.setGenre(dto.getGenre());

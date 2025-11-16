@@ -1,9 +1,9 @@
 
 package music.artist.service;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ejb.Stateless;
+import jakarta.ejb.LocalBean;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import music.artist.entity.Artist;
 import music.artist.dto.GetArtistsResponse;
@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@ApplicationScoped
+@LocalBean
+@Stateless
 @NoArgsConstructor(force = true)
 public class ArtistService {
 
@@ -64,17 +65,14 @@ public class ArtistService {
         });
     }
 
-    @Transactional
     public void create(Artist artist) {
         artistRepository.create(artist);
     }
 
-    @Transactional
     public void update(Artist artist) {
         artistRepository.update(artist);
     }
 
-    @Transactional
     public void delete(UUID id) {
         artistRepository.find(id).ifPresent(artistRepository::delete);
     }

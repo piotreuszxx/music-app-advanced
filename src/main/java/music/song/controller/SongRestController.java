@@ -1,7 +1,7 @@
 package music.song.controller;
 
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.core.Context;
@@ -21,10 +21,10 @@ import java.util.*;
 @RequestScoped
 public class SongRestController {
 
-    @Inject
+    @EJB
     SongService songService;
 
-    @Inject
+    @EJB
     ArtistService artistService;
 
     @GET

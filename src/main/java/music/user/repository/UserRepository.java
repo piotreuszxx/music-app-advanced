@@ -1,17 +1,16 @@
 
 package music.user.repository;
 
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import music.user.entity.User;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequestScoped
+@Dependent
 public class UserRepository {
 
     private EntityManager em;
@@ -38,7 +37,6 @@ public class UserRepository {
     }
 
     public void create(User user) {
-        if (user == null) return;
         em.persist(user);
     }
 
@@ -47,8 +45,7 @@ public class UserRepository {
     }
 
     public void delete(User user) {
-        User managed = em.contains(user) ? user : em.merge(user);
-        em.remove(managed);
+        em.remove(em.find(User.class, user.getId()));
     }
 
 }

@@ -1,10 +1,10 @@
 
 package music.user.service;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.annotation.Resource;
+import jakarta.ejb.LocalBean;
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
-import jakarta.servlet.ServletContext;
-import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import music.song.dto.GetSongsResponse;
 import music.user.dto.GetUserResponse;
@@ -16,7 +16,6 @@ import music.user.entity.User;
 import music.user.repository.UserRepository;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,17 +23,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@ApplicationScoped
+@LocalBean
+@Stateless
 @NoArgsConstructor(force = true)
 public class UserService {
 
-    private UserRepository userRepository;
-    private ServletContext servletContext;
+    private final UserRepository userRepository;
+
+    @Resource(name = "avatarDir")
+    private String avatarDir;
 
     @Inject
-    public UserService(UserRepository userRepository, ServletContext servletContext) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.servletContext = servletContext;
     }
 
     public Optional<User> find(UUID id) {
@@ -77,12 +78,10 @@ public class UserService {
         });
     }
 
-    @Transactional
     public void create(User user) {
         userRepository.create(user);
     }
 
-    @Transactional
     public boolean createFromRequest(PutUserRequest request, UUID uuid) {
         if (find(uuid).isPresent()) return false;
         User newUser = User.builder()
@@ -100,12 +99,10 @@ public class UserService {
         return true;
     }
 
-    @Transactional
     public void update(User user) {
         userRepository.update(user);
     }
 
-    @Transactional
     public boolean updatePartial(PatchUserRequest request, UUID uuid) {
         return find(uuid)
                 .map(user -> {
@@ -120,7 +117,6 @@ public class UserService {
                 .orElse(false);
     }
 
-    @Transactional
     public void delete(UUID id) {
         deleteAvatarFile(id.toString() + ".png");
         userRepository.delete(userRepository.find(id).orElseThrow());
@@ -135,7 +131,6 @@ public class UserService {
         });
     }
 
-    @Transactional
     public boolean updateAvatar(UUID id, byte[] avatarBytes) {
         return userRepository.find(id).map(user -> {
             user.setAvatar(avatarBytes);
@@ -145,7 +140,6 @@ public class UserService {
         }).orElse(false);
     }
 
-    @Transactional
     public boolean deleteAvatar(UUID id) {
         return userRepository.find(id).map(user -> {
             user.setAvatar(null);
@@ -157,7 +151,7 @@ public class UserService {
 
     private Path getAvatarDirPath() {
         String serverWorkDir = System.getProperty("user.dir");
-        String avatarsFolder = servletContext.getInitParameter("avatarDir");
+        String avatarsFolder = avatarDir;
         return Path.of(serverWorkDir, avatarsFolder);
     }
 

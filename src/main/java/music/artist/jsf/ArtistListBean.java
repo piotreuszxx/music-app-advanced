@@ -1,7 +1,7 @@
 package music.artist.jsf;
 
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import music.artist.dto.GetArtistsResponse;
 import music.artist.service.ArtistService;
@@ -14,10 +14,10 @@ import java.util.UUID;
 @RequestScoped
 public class ArtistListBean {
 
-    @Inject
+    @EJB
     ArtistService artistService;
 
-    @Inject
+    @EJB
     SongService songService;
 
     public List<GetArtistsResponse.Artist> getArtists() {

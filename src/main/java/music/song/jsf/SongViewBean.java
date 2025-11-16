@@ -1,6 +1,6 @@
 package music.song.jsf;
 
-import jakarta.inject.Inject;
+import jakarta.ejb.EJB;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import lombok.Getter;
@@ -23,10 +23,10 @@ public class SongViewBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
+    @EJB
     SongService songService;
 
-    @Inject
+    @EJB
     ArtistService artistService;
 
     private String id;

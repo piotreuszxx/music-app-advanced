@@ -1,7 +1,7 @@
 package music.song.jsf;
 
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import music.song.entity.Song;
 import music.song.service.SongService;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @RequestScoped
 public class SongListBean {
 
-    @Inject
+    @EJB
     SongService songService;
 
     public List<Song> getSongs() {
