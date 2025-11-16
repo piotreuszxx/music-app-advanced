@@ -54,7 +54,7 @@ Content-Type: multipart/form-data; boundary=boundary
 --boundary
 Content-Disposition: form-data; name="avatar"; filename="new_av.png"
 
-< src/main/resources/avatars/new_av.png
+< src/main/resources/avatars_to_upload/new_av.png
 --boundary--
 
 ### GET this user avatar

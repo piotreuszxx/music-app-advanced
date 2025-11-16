@@ -4,7 +4,6 @@ package music.song.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import lombok.NoArgsConstructor;
 import music.artist.entity.Artist;
 import music.song.entity.Song;
 import music.song.repository.SongRepository;
@@ -19,12 +18,14 @@ import music.user.service.UserService;
 import java.util.*;
 
 @ApplicationScoped
-@NoArgsConstructor(force = true)
 public class SongService {
 
     private SongRepository songRepository;
     private ArtistService artistService;
     private UserService userService;
+
+    protected SongService() {
+    }
 
     @Inject
     public SongService(SongRepository songRepository, ArtistService artistService, UserService userService) {
@@ -120,7 +121,7 @@ public class SongService {
             var artist = song.getArtist();
             if (artist.getSongs() == null) artist.setSongs(new ArrayList<>());
             artist.getSongs().add(song);
-            artistService.update(artist);
+            // artistService.update(artist);
         }
 
         // link to user (add Song object to user.songs)
@@ -128,7 +129,7 @@ public class SongService {
             var user = song.getUser();
             if (user.getSongs() == null) user.setSongs(new ArrayList<>());
             user.getSongs().add(song);
-            userService.update(user);
+            // userService.update(user);
         }
 
         return true;
@@ -146,12 +147,12 @@ public class SongService {
                 var oldArtist = song.getArtist();
                 if (oldArtist != null) {
                     oldArtist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                    artistService.update(oldArtist);
+                    // artistService.update(oldArtist);
                 }
                 artistService.find(request.getArtistId()).ifPresent(newArtist -> {
                     if (newArtist.getSongs() == null) newArtist.setSongs(new ArrayList<>());
                     newArtist.getSongs().add(song);
-                    artistService.update(newArtist);
+                    // artistService.update(newArtist);
                     song.setArtist(newArtist);
                 });
             }
@@ -166,7 +167,7 @@ public class SongService {
                 userService.find(request.getUserId()).ifPresent(newUser -> {
                     if (newUser.getSongs() == null) newUser.setSongs(new ArrayList<>());
                     newUser.getSongs().add(song);
-                    userService.update(newUser);
+                    // userService.update(newUser);
                     song.setUser(newUser);
                 });
             }
@@ -184,11 +185,11 @@ public class SongService {
             User user = song.getUser();
             if (artist != null) {
                 if (artist.getSongs() != null) artist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                artistService.update(artist);
+                // artistService.update(artist);
             }
             if (user != null) {
                 if (user.getSongs() != null) user.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                userService.update(user);
+                // userService.update(user);
             }
             songRepository.delete(song);
         });

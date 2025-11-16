@@ -156,15 +156,9 @@ public class UserService {
     }
 
     private Path getAvatarDirPath() {
-        String avatarParam = servletContext.getInitParameter("avatarDir");
-        if (avatarParam == null || avatarParam.isBlank()) {
-            throw new IllegalStateException("Context param 'avatarDir' must be defined in web.xml and point to avatar directory");
-        }
-        Path p = Path.of(avatarParam);
-        if (!p.isAbsolute()) {
-            p = Path.of(System.getProperty("user.dir")).resolve(p);
-        }
-        return p;
+        String serverWorkDir = System.getProperty("user.dir");
+        String avatarsFolder = servletContext.getInitParameter("avatarDir");
+        return Path.of(serverWorkDir, avatarsFolder);
     }
 
     private byte[] readAvatarFile(String fileName) {

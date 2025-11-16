@@ -170,19 +170,22 @@ public class InitializedData {
 
     }
 
-    private Path getAvatarDirPath() {
+    private Path getAvatarInitDirPath() {
         String avatarParam = servletContext.getInitParameter("avatarDir");
-        if (avatarParam == null || avatarParam.isBlank()) {
-            throw new IllegalStateException("Context param 'avatarDir' must be defined in web.xml and point to avatar directory");
-        }
-        Path p = Path.of(avatarParam);
-        if (!p.isAbsolute()) p = Path.of(System.getProperty("user.dir")).resolve(p);
-        return p;
+        String base = servletContext.getRealPath("/");
+        if (base == null) base = System.getProperty("java.io.tmpdir");
+        return Path.of(base, avatarParam);
+    }
+
+    private Path getAvatarServerDirPath() {
+        String serverWorkDir = System.getProperty("user.dir"); // defaultServer/
+        String avatarsFolder = servletContext.getInitParameter("avatarDir"); // "avatars"
+        return Path.of(serverWorkDir, avatarsFolder);
     }
 
     private byte[] readAvatar(String fileName) {
         try {
-            Path dir = getAvatarDirPath();
+            Path dir = getAvatarInitDirPath();
             Path avatarPath = dir.resolve(fileName);
             if (Files.exists(avatarPath)) {
                 return Files.readAllBytes(avatarPath);
@@ -204,7 +207,7 @@ public class InitializedData {
 //                System.out.println("[DEBUG] avatarDir=" + dir + ", avatarFs=" + dir.getFileSystem().getClass().getName() + ", defaultFs=" + java.nio.file.FileSystems.getDefault().getClass().getName());
 //            } catch (Exception ignored) {}
 
-            Path dir = getAvatarDirPath();
+            Path dir = getAvatarServerDirPath();
             if (!java.nio.file.Files.exists(dir)) {
                 java.nio.file.Files.createDirectories(dir);
             }
