@@ -17,7 +17,7 @@ import music.song.entity.Song;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User implements Serializable {
@@ -41,14 +41,14 @@ public class User implements Serializable {
     @ToString.Exclude
     private byte[] avatar;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
-    @ToString.Exclude //It's common to exclude lists from toString
+    @ToString.Exclude//It's common to exclude lists from toString
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Song> songs = new ArrayList<>();
 }

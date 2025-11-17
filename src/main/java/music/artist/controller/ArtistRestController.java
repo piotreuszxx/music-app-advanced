@@ -16,6 +16,7 @@ import music.artist.dto.PatchArtistRequest;
 import music.artist.dto.PutArtistRequest;
 import music.artist.service.ArtistService;
 import music.artist.entity.Artist;
+import music.user.entity.Role;
 
 import java.net.URI;
 import java.util.*;
@@ -51,7 +52,7 @@ public class ArtistRestController {
 
     @PUT
     @Path("{id}")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed(Role.ADMIN)
     public Response createArtist(@PathParam("id") UUID id, PutArtistRequest req, @Context UriInfo uriInfo) {
         if (artistService.find(id).isPresent()) {
             return Response.status(Response.Status.CONFLICT).entity("Artist already exists").build();
@@ -70,7 +71,7 @@ public class ArtistRestController {
 
     @PATCH
     @Path("{id}")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed(Role.ADMIN)
     public Response updateArtist(@PathParam("id") UUID id, PatchArtistRequest req) {
         boolean ok = artistService.find(id).map(artist -> {
             if (req.getName() != null) artist.setName(req.getName());
@@ -85,7 +86,7 @@ public class ArtistRestController {
 
     @DELETE
     @Path("{id}")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed(Role.ADMIN)
     public Response deleteArtist(@PathParam("id") UUID id) {
         if (artistService.find(id).isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -95,7 +96,7 @@ public class ArtistRestController {
     }
 
     @DELETE
-    @RolesAllowed("ADMIN")
+    @RolesAllowed(Role.ADMIN)
     public Response deleteAllArtistsWithSongs() {
         List<Artist> all = artistService.findAll();
         if(all.isEmpty()) {

@@ -12,7 +12,7 @@
         <feature>appSecurity-5.0</feature>
     </featureManager>
 
-    <application type="war" location="music-app-advanced-1.0-SNAPSHOT">
+    <application type="war" location="music-app-advanced-1.0-SNAPSHOT.war">
         <application-bnd>
             <security-role name="admin">
                 <group name="admin" access-id="group:jdbc/MusicDb/admin"/>

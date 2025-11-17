@@ -10,7 +10,7 @@ import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 @DatabaseIdentityStoreDefinition(
         dataSourceLookup = "jdbc/MusicDb",
         callerQuery = "select password from users where login = ?",
-        groupsQuery = "select roles from user_roles where user_id = (select id from users where login = ?)",
+        groupsQuery = "select role from user_roles where user_id = (select id from users where login = ?)",
         hashAlgorithm = Pbkdf2PasswordHash.class
 )
 public class AuthenticationConfig {

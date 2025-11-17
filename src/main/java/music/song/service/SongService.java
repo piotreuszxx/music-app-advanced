@@ -16,6 +16,7 @@ import music.song.dto.PatchSongRequest;
 import music.song.dto.GetSongResponse;
 import music.song.dto.GetSongsResponse;
 import music.artist.service.ArtistService;
+import music.user.entity.Role;
 import music.user.entity.User;
 import music.user.service.UserService;
 
@@ -90,19 +91,22 @@ public class SongService {
         return r;
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public void create(Song song) {
         songRepository.create(song);
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public void update(Song song) {
         songRepository.update(song);
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public void delete(UUID id) {
         songRepository.find(id).ifPresent(songRepository::delete);
     }
 
-    @RolesAllowed({"ADMIN","USER"})
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public boolean createWithLinks(PutSongRequest request, UUID uuid) {
         if (songRepository.find(uuid).isPresent()) return false;
         Song song = Song.builder()
@@ -150,6 +154,7 @@ public class SongService {
         return true;
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public boolean updatePartialWithLinks(PatchSongRequest request, UUID uuid) {
         return songRepository.find(uuid).map(song -> {
             // authorization: only ADMIN or owner can update
@@ -198,6 +203,7 @@ public class SongService {
         }).orElse(false);
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
             // authorization: only ADMIN or owner can delete
@@ -222,6 +228,7 @@ public class SongService {
         });
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public void deleteByArtist(UUID artistId) {
         if (artistId == null) return;
         var songs = findByArtist(artistId);
