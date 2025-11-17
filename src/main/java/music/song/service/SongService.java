@@ -4,6 +4,9 @@ package music.song.service;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.security.enterprise.SecurityContext;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.annotation.security.PermitAll;
 import lombok.NoArgsConstructor;
 import music.artist.entity.Artist;
 import music.song.entity.Song;
@@ -28,6 +31,9 @@ public class SongService {
     private final UserService userService;
 
     @Inject
+    private SecurityContext securityContext;
+
+    @Inject
     public SongService(SongRepository songRepository, ArtistService artistService, UserService userService) {
         this.songRepository = songRepository;
         this.artistService = artistService;
@@ -47,7 +53,18 @@ public class SongService {
     }
 
     public List<GetSongsResponse.Song> findByArtistDtos(UUID artistId) {
-        return findByArtist(artistId).stream().map(this::toSmallDto).toList();
+        List<Song> songs;
+        if (securityContext != null && securityContext.isCallerInRole("ADMIN")) {
+            songs = songRepository.findByArtist(artistId);
+        } else {
+            var principal = securityContext.getCallerPrincipal();
+            if (principal == null) return List.of();
+            var login = principal.getName();
+            var userOpt = userService.findByLogin(login);
+            if (userOpt.isEmpty()) return List.of();
+            songs = songRepository.findByArtistAndUser(artistId, userOpt.get().getId());
+        }
+        return songs.stream().map(this::toSmallDto).toList();
     }
 
     public Optional<GetSongResponse> findDto(UUID id) {
@@ -85,6 +102,7 @@ public class SongService {
         songRepository.find(id).ifPresent(songRepository::delete);
     }
 
+    @RolesAllowed({"ADMIN","USER"})
     public boolean createWithLinks(PutSongRequest request, UUID uuid) {
         if (songRepository.find(uuid).isPresent()) return false;
         Song song = Song.builder()
@@ -102,11 +120,12 @@ public class SongService {
             });
         }
 
-        // attach user object if provided
-        if (request.getUserId() != null) {
-            userService.find(request.getUserId()).ifPresent(user -> {
-                song.setUser(user);
-            });
+        // attach user object: owner is set automatically to the authenticated user if present
+        if (securityContext != null && securityContext.getCallerPrincipal() != null) {
+            String login = securityContext.getCallerPrincipal().getName();
+            userService.findByLogin(login).ifPresent(user -> song.setUser(user));
+        } else if (request.getUserId() != null) {
+            userService.find(request.getUserId()).ifPresent(user -> song.setUser(user));
         }
 
         // persist song first
@@ -133,6 +152,13 @@ public class SongService {
 
     public boolean updatePartialWithLinks(PatchSongRequest request, UUID uuid) {
         return songRepository.find(uuid).map(song -> {
+            // authorization: only ADMIN or owner can update
+            if (securityContext != null && !securityContext.isCallerInRole("ADMIN")) {
+                var principal = securityContext.getCallerPrincipal();
+                if (principal == null) return false;
+                var login = principal.getName();
+                if (song.getUser() == null || !login.equals(song.getUser().getLogin())) return false;
+            }
             if (request.getTitle() != null) song.setTitle(request.getTitle());
             if (request.getGenre() != null) song.setGenre(request.getGenre());
             if (request.getReleaseYear() != null) song.setReleaseYear(request.getReleaseYear());
@@ -174,6 +200,13 @@ public class SongService {
 
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
+            // authorization: only ADMIN or owner can delete
+            if (securityContext != null && !securityContext.isCallerInRole("ADMIN")) {
+                var principal = securityContext.getCallerPrincipal();
+                if (principal == null) return;
+                var login = principal.getName();
+                if (song.getUser() == null || !login.equals(song.getUser().getLogin())) return;
+            }
             // System.out.println("[DEBUG] SongService.deleteWithUnlink: deleting song " + uuid);
             Artist artist = song.getArtist();
             User user = song.getUser();

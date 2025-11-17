@@ -1,13 +1,7 @@
 package music.user.entity;
 
-public enum Role {
-    ADMIN, USER;
+public class Role {
 
-    String getRoleName() {
-        if (this == ADMIN) {
-            return "admin";
-        } else {
-            return "user";
-        }
-    }
+    public static final String ADMIN = "admin";
+    public static final String USER = "user";
 }

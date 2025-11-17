@@ -1,5 +1,7 @@
 package music.artist.controller;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.*;
@@ -28,6 +30,7 @@ public class ArtistRestController {
     ArtistService artistService;
 
     @GET
+    @PermitAll
     public Response getAllArtists() {
         List<GetArtistsResponse.Artist> all = artistService.findAllDtos();
         if(all.isEmpty()) {
@@ -38,6 +41,7 @@ public class ArtistRestController {
 
     @GET
     @Path("{id}")
+    @PermitAll
     public Response getArtist(@PathParam("id") UUID id) {
         Optional<GetArtistResponse> dto = artistService.findDto(id);
         if(dto.isEmpty())
@@ -47,6 +51,7 @@ public class ArtistRestController {
 
     @PUT
     @Path("{id}")
+    @RolesAllowed("ADMIN")
     public Response createArtist(@PathParam("id") UUID id, PutArtistRequest req, @Context UriInfo uriInfo) {
         if (artistService.find(id).isPresent()) {
             return Response.status(Response.Status.CONFLICT).entity("Artist already exists").build();
@@ -65,6 +70,7 @@ public class ArtistRestController {
 
     @PATCH
     @Path("{id}")
+    @RolesAllowed("ADMIN")
     public Response updateArtist(@PathParam("id") UUID id, PatchArtistRequest req) {
         boolean ok = artistService.find(id).map(artist -> {
             if (req.getName() != null) artist.setName(req.getName());
@@ -79,6 +85,7 @@ public class ArtistRestController {
 
     @DELETE
     @Path("{id}")
+    @RolesAllowed("ADMIN")
     public Response deleteArtist(@PathParam("id") UUID id) {
         if (artistService.find(id).isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -88,6 +95,7 @@ public class ArtistRestController {
     }
 
     @DELETE
+    @RolesAllowed("ADMIN")
     public Response deleteAllArtistsWithSongs() {
         List<Artist> all = artistService.findAll();
         if(all.isEmpty()) {

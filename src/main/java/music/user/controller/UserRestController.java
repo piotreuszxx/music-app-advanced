@@ -1,5 +1,7 @@
 package music.user.controller;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.*;
@@ -31,6 +33,7 @@ public class UserRestController {
     UserService userService;
 
     @GET
+    @RolesAllowed("ADMIN")
     public Response getAllUsers() {
         List<GetUsersResponse.User> all = userService.findAllDtos();
         if (all.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
@@ -39,6 +42,7 @@ public class UserRestController {
 
     @PUT
     @Path("{id}")
+    @PermitAll
     public Response createUser(@PathParam("id") UUID id, PutUserRequest req, @Context UriInfo uriInfo) {
         boolean created = userService.createFromRequest(req, id);
         if (!created) return Response.status(Response.Status.CONFLICT).entity("User already exists").build();
@@ -48,6 +52,7 @@ public class UserRestController {
 
     @GET
     @Path("{id}")
+    @RolesAllowed("ADMIN")
     public Response getUser(@PathParam("id") UUID id) {
         Optional<GetUserResponse> dto = userService.findDto(id);
         if (dto.isEmpty()) return Response.status(Response.Status.NOT_FOUND).build();
@@ -56,6 +61,7 @@ public class UserRestController {
 
     @PATCH
     @Path("{id}")
+    @RolesAllowed("ADMIN")
     public Response updateUserPartial(@PathParam("id") UUID id, PatchUserRequest req) {
         boolean ok = userService.updatePartial(req, id);
         return ok ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
@@ -63,6 +69,7 @@ public class UserRestController {
 
     @DELETE
     @Path("{id}")
+    @RolesAllowed("ADMIN")
     public Response deleteUser(@PathParam("id") UUID id) {
         if (userService.find(id).isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -75,6 +82,7 @@ public class UserRestController {
     @GET
     @Path("{id}/avatar")
     @Produces("image/png")
+    @RolesAllowed("ADMIN")
     public Response getUserAvatar(@PathParam("id") UUID id) {
         Optional<byte[]> avatarOpt = userService.getAvatar(id);
         if (avatarOpt.isEmpty()) {
@@ -91,6 +99,7 @@ public class UserRestController {
 
     @PUT
     @Path("{id}/avatar")
+    @RolesAllowed("ADMIN")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response putUserAvatar(@PathParam("id") UUID id, @Context HttpServletRequest request) {
         try {
@@ -111,6 +120,7 @@ public class UserRestController {
 
     @DELETE
     @Path("{id}/avatar")
+    @RolesAllowed("ADMIN")
     public Response deleteUserAvatar(@PathParam("id") UUID id) {
         boolean deleted = userService.deleteAvatar(id);
         if (!deleted) return Response.status(Response.Status.NOT_FOUND).build();

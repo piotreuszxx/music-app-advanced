@@ -1,5 +1,6 @@
 package music.song.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.*;
@@ -28,6 +29,7 @@ public class SongRestController {
     ArtistService artistService;
 
     @GET
+    @RolesAllowed({"ADMIN","USER"})
     public Response getAllSongsFromArtist(@PathParam("artistId") UUID artistId) {
         if (artistService.find(artistId).isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -41,6 +43,7 @@ public class SongRestController {
 
     @GET
     @Path("{id}")
+    @RolesAllowed({"ADMIN","USER"})
     public Response getSongFromArtistById(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id) {
         Optional<GetSongResponse> s = songService.findDto(id);
         if (s.isEmpty())
@@ -54,6 +57,7 @@ public class SongRestController {
 
     @PUT
     @Path("{id}")
+    @RolesAllowed({"ADMIN","USER"})
     public Response createSongForArtist(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PutSongRequest req, @Context UriInfo uriInfo) {
         if (artistService.find(artistId).isEmpty())
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -67,6 +71,7 @@ public class SongRestController {
 
     @PATCH
     @Path("{id}")
+    @RolesAllowed({"ADMIN","USER"})
     public Response updateSongByArtist(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id, PatchSongRequest req) {
         Optional<GetSongResponse> s = songService.findDto(id);
         if (s.isEmpty())
@@ -83,6 +88,7 @@ public class SongRestController {
 
     @DELETE
     @Path("{id}")
+    @RolesAllowed({"ADMIN","USER"})
     public Response deleteSong(@PathParam("artistId") UUID artistId, @PathParam("id") UUID id) {
         Optional<GetSongResponse> s = songService.findDto(id);
         if (s.isEmpty())
@@ -94,6 +100,7 @@ public class SongRestController {
     }
 
     @DELETE
+    @RolesAllowed({"ADMIN"})
     public Response deleteAllForArtist(@PathParam("artistId") UUID artistId) {
         if (artistService.find(artistId).isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();

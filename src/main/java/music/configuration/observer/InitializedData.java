@@ -1,11 +1,11 @@
 package music.configuration.observer;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.ejb.Singleton;
-import jakarta.ejb.Startup;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
+import jakarta.ejb.*;
+import jakarta.annotation.security.DeclareRoles;
+import jakarta.annotation.security.RunAs;
 import jakarta.inject.Inject;
+import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import jakarta.annotation.Resource;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -20,7 +20,6 @@ import music.song.service.SongService;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,12 +27,20 @@ import java.util.UUID;
 
 @Singleton
 @Startup
-@TransactionAttribute(value = TransactionAttributeType.NOT_SUPPORTED)
+@TransactionAttribute(value = TransactionAttributeType.REQUIRED)
+@DependsOn("InitializeAdminService")
+@DeclareRoles({Role.ADMIN, Role.USER})
+@RunAs(Role.ADMIN)
 @NoArgsConstructor
 public class InitializedData {
 
+    @EJB
     private UserService userService;
+
+    @EJB
     private ArtistService artistService;
+
+    @EJB
     private SongService songService;
 
     @Resource(name = "avatarDir")
@@ -43,33 +50,27 @@ public class InitializedData {
     private String avatarInitDir;
 
     @Inject
-    public InitializedData(UserService userService,
-                           ArtistService artistService,
-                           SongService songService) {
-        this.userService = userService;
-        this.artistService = artistService;
-        this.songService = songService;
-    }
+    private Pbkdf2PasswordHash passwordHash;
 
     @PostConstruct
     @SneakyThrows
     private void initData() {
         // if admin exists, assume DB already initialized -> skip seeding
-        if (userService.findByLogin("admin").isPresent()) {
-            System.out.println("[INFO] Data already initialized");
-            return;
-        }
-        User admin = User.builder()
-                .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
-                .login("admin")
-                .name("System")
-                .surname("Admin")
-                .birthday(LocalDate.of(2000, 1, 1))
-                .email("admin@simplerpg.example.com")
-                .password("admin123")
-                .roles(List.of(Role.ADMIN, Role.USER))
-                .avatar(getResourceAsByteArray("admin.png"))
-                .build();
+//        if (userService.findByLogin("admin").isPresent()) {
+//            System.out.println("[INFO] Data already initialized");
+//            return;
+//        }
+//        User admin = User.builder()
+//                .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
+//                .login("admin")
+//                .name("System")
+//                .surname("Admin")
+//                .birthday(LocalDate.of(2000, 1, 1))
+//                .email("admin@simplerpg.example.com")
+//                .password(passwordHash.generate("admin123".toCharArray()))
+//                .roles(List.of(Role.ADMIN, Role.USER))
+//                .avatar(getResourceAsByteArray("admin.png"))
+//                .build();
 
         User piotr = User.builder()
                 .id(UUID.fromString("11111111-1111-1111-1111-000000000001"))
@@ -78,7 +79,7 @@ public class InitializedData {
                 .surname("Przymus")
                 .birthday(LocalDate.of(2003, 5, 15))
                 .email("piotreusz@gmail.com")
-                .password("piotr123")
+                .password(passwordHash.generate("piotr123".toCharArray()))
                 .roles(List.of(Role.USER))
                 .avatar(getResourceAsByteArray("piotreusz.png"))
                 .build();
@@ -90,7 +91,7 @@ public class InitializedData {
                 .surname("Sengebusch")
                 .birthday(LocalDate.of(2003, 5, 2))
                 .email("nicolele@gmail.com")
-                .password("nicole123")
+                .password(passwordHash.generate("nicole123".toCharArray()))
                 .roles(List.of(Role.USER))
                 .avatar(getResourceAsByteArray("nicole.png"))
                 .build();
@@ -102,7 +103,7 @@ public class InitializedData {
                 .surname("Gosling")
                 .birthday(LocalDate.of(1980, 5, 2))
                 .email("driver@gmail.com")
-                .password("driver123")
+                .password(passwordHash.generate("driver123".toCharArray()))
                 .roles(List.of(Role.USER))
                 .avatar(getResourceAsByteArray("ryan.png"))
                 .build();
@@ -114,13 +115,13 @@ public class InitializedData {
                 .surname("Profilowego")
                 .birthday(LocalDate.of(2005, 1, 1))
                 .email("bezprof@gmail.com")
-                .password("bezprof123")
+                .password(passwordHash.generate("bezprof123".toCharArray()))
                 .roles(List.of(Role.USER))
                 .avatar(null)
                 .build();
 
-        userService.create(admin);
-        persistAvatarFile(admin);
+//        userService.create(admin);
+//        persistAvatarFile(admin);
         userService.create(piotr);
         persistAvatarFile(piotr);
         userService.create(nicole);

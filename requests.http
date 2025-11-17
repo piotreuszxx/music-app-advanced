@@ -1,6 +1,15 @@
+// @no-cookie-jar
 ### GET users
 GET http://localhost:9080/music-app-advanced/api/users
+Authorization: Basic YWRtaW46YWRtaW4xMjM=
 
+# Authorization: Basic YWRtaW46YWRtaW4xMjM=    # admin:admin123
+# Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz    # piotreusz:piotr123
+# Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz    # nicolele:nicole123
+# Authorization: Basic ZHJpdmVyOmRyaXZlcjEyMw==    # driver:driver123
+# Authorization: Basic YmV6cHJvZjpiZXpwcm9mMTIz    # bezprof:bezprof123
+
+// @no-cookie-jar
 ### GET user by id (existing)
 GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000001
 
@@ -22,6 +31,8 @@ Content-Type: application/json
 ### GET this new user
 GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
 
+# Example using admin credentials
+# Authorization: Basic YWRtaW46YWRtaW4xMjM=
 ### PATCH update user
 PATCH http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
 Content-Type: application/json

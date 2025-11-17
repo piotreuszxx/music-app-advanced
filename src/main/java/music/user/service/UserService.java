@@ -2,9 +2,11 @@
 package music.user.service;
 
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
+import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import lombok.NoArgsConstructor;
 import music.song.dto.GetSongsResponse;
 import music.user.dto.GetUserResponse;
@@ -32,6 +34,9 @@ public class UserService {
 
     @Resource(name = "avatarDir")
     private String avatarDir;
+
+    @Inject
+    private Pbkdf2PasswordHash passwordHash;
 
     @Inject
     public UserService(UserRepository userRepository) {
@@ -78,6 +83,7 @@ public class UserService {
         });
     }
 
+    @RolesAllowed(Role.ADMIN)
     public void create(User user) {
         userRepository.create(user);
     }
@@ -90,7 +96,7 @@ public class UserService {
                 .name(request.getName())
                 .surname(request.getSurname())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(passwordHash.generate(request.getPassword().toCharArray()))
                 .roles(List.of(Role.USER))
                 .avatar(readAvatarFile("guest.png"))
                 .songs(new ArrayList<>())
@@ -99,10 +105,12 @@ public class UserService {
         return true;
     }
 
+    @RolesAllowed(Role.ADMIN)
     public void update(User user) {
         userRepository.update(user);
     }
 
+    @RolesAllowed(Role.ADMIN)
     public boolean updatePartial(PatchUserRequest request, UUID uuid) {
         return find(uuid)
                 .map(user -> {
@@ -110,13 +118,14 @@ public class UserService {
                     if (request.getName() != null) user.setName(request.getName());
                     if (request.getSurname() != null) user.setSurname(request.getSurname());
                     if (request.getEmail() != null) user.setEmail(request.getEmail());
-                    if (request.getPassword() != null) user.setPassword(request.getPassword());
+                    if (request.getPassword() != null) user.setPassword(passwordHash.generate(request.getPassword().toCharArray()));
                     userRepository.update(user);
                     return true;
                 })
                 .orElse(false);
     }
 
+    @RolesAllowed(Role.ADMIN)
     public void delete(UUID id) {
         deleteAvatarFile(id.toString() + ".png");
         userRepository.delete(userRepository.find(id).orElseThrow());
@@ -131,6 +140,7 @@ public class UserService {
         });
     }
 
+    @RolesAllowed(Role.ADMIN)
     public boolean updateAvatar(UUID id, byte[] avatarBytes) {
         return userRepository.find(id).map(user -> {
             user.setAvatar(avatarBytes);

@@ -35,6 +35,21 @@ public class SongRepository {
                 .getResultList();
     }
 
+    public List<Song> findByArtistAndUser(UUID artistId, UUID userId) {
+        if (artistId == null || userId == null) return List.of();
+        return em.createQuery("SELECT s FROM Song s WHERE s.artist.id = :aid AND s.user.id = :uid", Song.class)
+                .setParameter("aid", artistId)
+                .setParameter("uid", userId)
+                .getResultList();
+    }
+
+    public List<Song> findByUser(UUID userId) {
+        if (userId == null) return List.of();
+        return em.createQuery("SELECT s FROM Song s WHERE s.user.id = :uid", Song.class)
+                .setParameter("uid", userId)
+                .getResultList();
+    }
+
     public void create(Song song) {
         em.persist(song);
     }
