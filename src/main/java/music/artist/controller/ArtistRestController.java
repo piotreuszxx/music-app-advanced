@@ -71,25 +71,15 @@ public class ArtistRestController {
     @Path("{id}")
     @RolesAllowed(Role.ADMIN)
     public Response deleteArtist(@PathParam("id") UUID id) {
-        if (artistService.find(id).isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        artistService.delete(id);
-        return Response.noContent().build();
+        boolean deleted = artistService.deleteArtistWithSongs(id);
+        return deleted ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @DELETE
     @RolesAllowed(Role.ADMIN)
     public Response deleteAllArtistsWithSongs() {
-        List<Artist> all = artistService.findAll();
-        if(all.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        for (Artist a : all) {
-            if (a.getId() != null) {
-                artistService.delete(a.getId());
-            }
-        }
+        int deleted = artistService.deleteAllArtistsWithSongs();
+        if (deleted == 0) return Response.status(Response.Status.NOT_FOUND).build();
         return Response.noContent().build();
     }
 }

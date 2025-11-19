@@ -14,6 +14,7 @@ import music.artist.dto.GetArtistsResponse;
 import music.artist.dto.GetArtistResponse;
 import music.song.dto.GetSongsResponse;
 import music.artist.repository.ArtistRepository;
+import music.song.repository.SongRepository;
 import music.user.entity.Role;
 
 import java.util.List;
@@ -27,9 +28,12 @@ public class ArtistService {
 
     private ArtistRepository artistRepository;
 
+    private SongRepository songRepository;
+
     @Inject
-    public ArtistService(ArtistRepository artistRepository) {
+    public ArtistService(ArtistRepository artistRepository, SongRepository songRepository) {
         this.artistRepository = artistRepository;
+        this.songRepository = songRepository;
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
@@ -98,6 +102,37 @@ public class ArtistService {
             update(artist);
             return true;
         }).orElse(false);
+    }
+
+    /**
+     * Delete artist and all their songs using repositories (no cross-service injection).
+     */
+    @RolesAllowed(Role.ADMIN)
+    public boolean deleteArtistWithSongs(UUID artistId) {
+        return find(artistId).map(artist -> {
+            var songs = songRepository.findByArtist(artistId);
+            for (var s : songs) {
+                songRepository.delete(s);
+            }
+            delete(artistId);
+            return true;
+        }).orElse(false);
+    }
+
+    @RolesAllowed(Role.ADMIN)
+    public int deleteAllArtistsWithSongs() {
+        List<Artist> all = findAll();
+        if (all.isEmpty()) return 0;
+        int count = 0;
+        for (Artist a : all) {
+            if (a.getId() != null) {
+                var songs = songRepository.findByArtist(a.getId());
+                for (var s : songs) songRepository.delete(s);
+                delete(a.getId());
+                count++;
+            }
+        }
+        return count;
     }
 
     @RolesAllowed(Role.ADMIN)
