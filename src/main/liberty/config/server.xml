@@ -14,12 +14,12 @@
 
     <application type="war" location="music-app-advanced-1.0-SNAPSHOT.war">
         <application-bnd>
-            <security-role name="admin">
-                <group name="admin" access-id="group:jdbc/MusicDb/admin"/>
+            <security-role name="ADMINISTRATOR">
+                <group name="ADMINISTRATOR" access-id="group:jdbc/MusicDb/ADMINISTRATOR"/>
                 <run-as userid="admin-service"/>
             </security-role>
-            <security-role name="user">
-                <group name="user" access-id="group:jdbc/MusicDb/user"/>
+            <security-role name="USER">
+                <group name="USER" access-id="group:jdbc/MusicDb/USER"/>
             </security-role>
         </application-bnd>
     </application>

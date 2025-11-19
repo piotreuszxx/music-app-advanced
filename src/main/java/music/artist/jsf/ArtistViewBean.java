@@ -66,11 +66,15 @@ public class ArtistViewBean implements Serializable {
         try {
             UUID sid = UUID.fromString(songToDeleteId);
             songService.deleteWithUnlink(sid);
+            // clear selection and refresh view
+            songToDeleteId = null;
+            return "/artists/view.xhtml?id=" + id + "&faces-redirect=true";
         } catch (IllegalArgumentException e) {
+            return null;
+        } catch (Exception e) {
+            // deletion forbidden or failed - stay on page
+            return null;
         }
-        // clear selection and refresh view
-        songToDeleteId = null;
-        return "/artists/view.xhtml?id=" + id + "&faces-redirect=true";
     }
 
     public String deleteArtist(String artistId) {

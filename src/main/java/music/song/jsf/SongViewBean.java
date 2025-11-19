@@ -44,7 +44,7 @@ public class SongViewBean implements Serializable {
                 if (song != null && song.getArtistId() != null) {
                     artist = artistService.findDto(song.getArtistId()).orElse(null);
                 }
-            } catch (IllegalArgumentException ignored) {
+            } catch (Exception ignored) {
             }
         }
     }

@@ -1,23 +1,32 @@
-// @no-cookie-jar
+# Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+# Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz         # piotreusz:piotr123
+# Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz         # nicolele:nicole123
+# Authorization: Basic ZHJpdmVyOmRyaXZlcjEyMw==         # driver:driver123
+# Authorization: Basic YmV6cHJvZjpiZXpwcm9mMTIz         # bezprof:bezprof123
+
 ### GET users
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users
-Authorization: Basic YWRtaW46YWRtaW4xMjM=
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
-# Authorization: Basic YWRtaW46YWRtaW4xMjM=    # admin:admin123
-# Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz    # piotreusz:piotr123
-# Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz    # nicolele:nicole123
-# Authorization: Basic ZHJpdmVyOmRyaXZlcjEyMw==    # driver:driver123
-# Authorization: Basic YmV6cHJvZjpiZXpwcm9mMTIz    # bezprof:bezprof123
-
-// @no-cookie-jar
 ### GET user by id (existing)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000001
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### GET user by id (not existing)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### PUT create user
+# @no-cookie-jar
 PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+#Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 Content-Type: application/json
 
 {
@@ -29,12 +38,16 @@ Content-Type: application/json
 }
 
 ### GET this new user
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
-# Example using admin credentials
-# Authorization: Basic YWRtaW46YWRtaW4xMjM=
 ### PATCH update user
+# @no-cookie-jar
 PATCH http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 Content-Type: application/json
 
 {
@@ -45,21 +58,36 @@ Content-Type: application/json
 	"password": "updatedpassword"
 }
 
-### DELETE user
-DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
 
+### DELETE user
+# @no-cookie-jar
+DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### GET user avatar
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000003/avatar
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### GET user avatar (null avatar field)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### GET user avatar (not existing user)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users/00000000-0000-0000-0000-000000000000/avatar
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### PUT upload user avatar (for one without, when created can be for one with)
+# @no-cookie-jar
 PUT http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -69,27 +97,46 @@ Content-Disposition: form-data; name="avatar"; filename="new_av.png"
 --boundary--
 
 ### GET this user avatar
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### DELETE user avatar
+# @no-cookie-jar
 DELETE http://localhost:9080/music-app-advanced/api/users/11111111-1111-1111-1111-000000000004/avatar
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 
-############################
-# artists and songs
-############################
+# -------------------------------------------------------------------------
+# --------------------------- artists and songs ---------------------------
+# -------------------------------------------------------------------------
+
 
 ### GET all artists
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### GET artist by id (existing)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### GET artist by id (not existing)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists/00000000-0000-0000-0000-000000000000
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### PUT create artist
+# @no-cookie-jar
 PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 Content-Type: application/json
 
 {
@@ -99,22 +146,17 @@ Content-Type: application/json
 	"height": 1.8
 }
 
-### PUT create artist (conflict - same id)
-PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
-Content-Type: application/json
-
-{
-	"name": "Ken Carson Duplicate",
-	"country": "USA",
-	"debutYear": "2000-01-01",
-	"height": 1.8
-}
-
 ### GET this new artist
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### PATCH update artist (partial)
+# @no-cookie-jar
 PATCH http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 Content-Type: application/json
 
 {
@@ -122,36 +164,73 @@ Content-Type: application/json
 }
 
 ### DELETE artist (newly created)
+# @no-cookie-jar
 DELETE http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### DELETE all artists (collection)
+# @no-cookie-jar
 DELETE http://localhost:9080/music-app-advanced/api/artists
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 # songs
 
 ### GET songs by artist (list)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+#Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123 - if delete all songs by artist ...01, will return 404
+Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz       # nicolele:nicole123 - use artist ..02 and this user to see results
 
 ### GET song by id (existing under artist)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000001
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+#Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
+Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz       # nicolele:nicole123 - artist 02, song 02
 
 ### GET song by id (not found)
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/00000000-0000-0000-0000-000000000000
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
-### PUT create song under artist (single)
+### PUT create song under artist - without setting userId (set by server to logged-in user)
+# @no-cookie-jar
 PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 Content-Type: application/json
 
 {
 	"title": "Money Longer",
 	"genre": "HIPHOP",
 	"releaseYear": "2016-01-01",
-	"duration": 2.5,
-	"userId": "11111111-1111-1111-1111-000000000001"
+	"duration": 2.5
+}
+
+### PUT create song under artist - Try to set owner as USER, will return 403
+# @no-cookie-jar
+PUT http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
+Content-Type: application/json
+
+{
+  "title": "Money Longer",
+  "genre": "HIPHOP",
+  "releaseYear": "2016-01-01",
+  "duration": 2.5,
+  "userId": "11111111-1111-1111-1111-000000000001"
 }
 
 ### PUT create song under non-existing artist (should return 404)
+# @no-cookie-jar
 PUT http://localhost:9080/music-app-advanced/api/artists/00000000-0000-0000-0000-000000000000/songs/33333333-3333-3333-3333-000000000010
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 Content-Type: application/json
 
 {
@@ -163,19 +242,33 @@ Content-Type: application/json
 }
 
 ### GET this new song
+# @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
+#Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz       # nicolele:nicole123 - try to update non-owned songs
 
-### PATCH update song (partial)
+### PATCH update song (partial) - can also try setting userId to another user (should return 403)
+# @no-cookie-jar
 PATCH http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
+#Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz       # nicolele:nicole123 - try to update non-owned songs
 Content-Type: application/json
 
 {
-	"title": "Updated Title",
-	"userId": "11111111-1111-1111-1111-000000000002"
+	"title": "Updated Title"
 }
 
 ### DELETE song (single)
+# @no-cookie-jar
 DELETE http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs/33333333-3333-3333-3333-000000000009
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
+#Authorization: Basic bmljb2xlbGU6bmljb2xlMTIz       # nicolele:nicole123 - try to delete non-owned songs
 
 ### DELETE all songs for an artist (collection)
+# @no-cookie-jar
 DELETE http://localhost:9080/music-app-advanced/api/artists/22222222-2222-2222-2222-000000000001/songs
+#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123

@@ -22,7 +22,13 @@ public class SongListBean {
 
     public String delete(UUID id) {
         if (id != null) {
-            songService.deleteWithUnlink(id);
+            try {
+                songService.deleteWithUnlink(id);
+                return "/songs/list.xhtml?faces-redirect=true";
+            } catch (Exception ignored) {
+                // if deletion was forbidden or failed, stay on current page
+                return null;
+            }
         }
         return "/songs/list.xhtml?faces-redirect=true";
     }

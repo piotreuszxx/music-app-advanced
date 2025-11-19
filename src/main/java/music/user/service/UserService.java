@@ -2,6 +2,7 @@
 package music.user.service;
 
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.LocalBean;
 import jakarta.ejb.Stateless;
@@ -88,6 +89,7 @@ public class UserService {
         userRepository.create(user);
     }
 
+    @PermitAll
     public boolean createFromRequest(PutUserRequest request, UUID uuid) {
         if (find(uuid).isPresent()) return false;
         User newUser = User.builder()
@@ -131,6 +133,7 @@ public class UserService {
         userRepository.delete(userRepository.find(id).orElseThrow());
     }
 
+    @RolesAllowed(Role.ADMIN)
     public Optional<byte[]> getAvatar(UUID id) {
         return userRepository.find(id).map(user -> {
             byte[] fromFile = null;
@@ -152,6 +155,13 @@ public class UserService {
 
     public boolean deleteAvatar(UUID id) {
         return userRepository.find(id).map(user -> {
+            boolean hasDbAvatar = user.getAvatar() != null;
+            byte[] fileBytes = readAvatarFile(id.toString() + ".png");
+            boolean hasFileAvatar = fileBytes != null;
+            if (!hasDbAvatar && !hasFileAvatar) {
+                // nothing to delete
+                return false;
+            }
             user.setAvatar(null);
             userRepository.update(user);
             deleteAvatarFile(id.toString() + ".png");

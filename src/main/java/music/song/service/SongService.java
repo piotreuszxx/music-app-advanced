@@ -6,7 +6,6 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.SecurityContext;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.annotation.security.PermitAll;
 import lombok.NoArgsConstructor;
 import music.artist.entity.Artist;
 import music.song.entity.Song;
@@ -41,21 +40,25 @@ public class SongService {
         this.userService = userService;
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Optional<Song> find(UUID id) {
         return songRepository.find(id);
     }
 
+    @RolesAllowed(Role.ADMIN)
     public List<Song> findAll() {
         return songRepository.findAll();
     }
 
+    @RolesAllowed(Role.ADMIN)
     public List<Song> findByArtist(UUID artistId) {
         return songRepository.findByArtist(artistId);
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public List<GetSongsResponse.Song> findByArtistDtos(UUID artistId) {
         List<Song> songs;
-        if (securityContext != null && securityContext.isCallerInRole("ADMIN")) {
+        if (securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
             songs = songRepository.findByArtist(artistId);
         } else {
             var principal = securityContext.getCallerPrincipal();
@@ -68,8 +71,25 @@ public class SongService {
         return songs.stream().map(this::toSmallDto).toList();
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Optional<GetSongResponse> findDto(UUID id) {
-        return find(id).map(this::toFullDto);
+        Optional<Song> opt = find(id);
+        if (opt.isEmpty()) return Optional.empty();
+        Song s = opt.get();
+        // admin can see any song
+        if (securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
+            return Optional.of(toFullDto(s));
+        }
+        // otherwise only owner may see
+        var principal = securityContext == null ? null : securityContext.getCallerPrincipal();
+        if (principal == null) throw new RuntimeException("Access denied: not owner");
+        var login = principal.getName();
+        var userOpt = userService.findByLogin(login);
+        if (userOpt.isEmpty()) throw new RuntimeException("Access denied: not owner");
+        if (s.getUser() == null || !Objects.equals(s.getUser().getId(), userOpt.get().getId())) {
+            throw new RuntimeException("Access denied: not owner");
+        }
+        return Optional.of(toFullDto(s));
     }
 
     private GetSongsResponse.Song toSmallDto(Song s) {
@@ -106,8 +126,44 @@ public class SongService {
         songRepository.find(id).ifPresent(songRepository::delete);
     }
 
+    @RolesAllowed(Role.ADMIN)
+    public boolean createWithLinksInit(PutSongRequest request, UUID uuid) {
+        if (songRepository.find(uuid).isPresent()) return false;
+
+        Song song = Song.builder()
+                .id(uuid)
+                .title(request.getTitle())
+                .genre(request.getGenre())
+                .releaseYear(request.getReleaseYear())
+                .duration(request.getDuration())
+                .artist(artistService.find(request.getArtistId()).orElse(null))
+                .user(userService.find(request.getUserId()).orElse(null))
+                .build();
+
+        // persist song first
+        songRepository.create(song);
+
+        // link to artist (add Song object to artist.songs)
+        if (song.getArtist() != null) {
+            var artist = song.getArtist();
+            if (artist.getSongs() == null) artist.setSongs(new ArrayList<>());
+            artist.getSongs().add(song);
+            // artistService.update(artist);
+        }
+
+        // link to user (add Song object to user.songs)
+        if (song.getUser() != null) {
+            var user = song.getUser();
+            if (user.getSongs() == null) user.setSongs(new ArrayList<>());
+            user.getSongs().add(song);
+            // userService.update(user);
+        }
+
+        return true;
+    }
+
     @RolesAllowed({Role.ADMIN, Role.USER})
-    public boolean createWithLinks(PutSongRequest request, UUID uuid) {
+    public boolean createWithLinks(PutSongRequest request, UUID uuid) throws Exception {
         if (songRepository.find(uuid).isPresent()) return false;
         Song song = Song.builder()
                 .id(uuid)
@@ -116,6 +172,7 @@ public class SongService {
                 .releaseYear(request.getReleaseYear())
                 .duration(request.getDuration())
                 .build();
+        /// user id is ignored, owner is set to authenticated user if present
 
         // attach artist object if provided
         if (request.getArtistId() != null) {
@@ -124,12 +181,18 @@ public class SongService {
             });
         }
 
-        // attach user object: owner is set automatically to the authenticated user if present
-        if (securityContext != null && securityContext.getCallerPrincipal() != null) {
+        // attach user object: owner is set from authenticated principal for normal users.
+        // If request.userId is provided, only ADMIN is allowed to set owner explicitly.
+        if (request.getUserId() != null && (securityContext == null || !securityContext.isCallerInRole(Role.ADMIN))) {
+            throw new Exception("Only administrators may set owner on create");
+        }
+
+        if (request.getUserId() != null && securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
+            // admin creating on behalf of another user
+            userService.find(request.getUserId()).ifPresent(user -> song.setUser(user));
+        } else if (securityContext != null && securityContext.getCallerPrincipal() != null) {
             String login = securityContext.getCallerPrincipal().getName();
             userService.findByLogin(login).ifPresent(user -> song.setUser(user));
-        } else if (request.getUserId() != null) {
-            userService.find(request.getUserId()).ifPresent(user -> song.setUser(user));
         }
 
         // persist song first
@@ -155,10 +218,10 @@ public class SongService {
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
-    public boolean updatePartialWithLinks(PatchSongRequest request, UUID uuid) {
+    public boolean updatePartialWithLinks(PatchSongRequest request, UUID uuid) throws Exception {
         return songRepository.find(uuid).map(song -> {
             // authorization: only ADMIN or owner can update
-            if (securityContext != null && !securityContext.isCallerInRole("ADMIN")) {
+            if (securityContext != null && !securityContext.isCallerInRole(Role.ADMIN)) {
                 var principal = securityContext.getCallerPrincipal();
                 if (principal == null) return false;
                 var login = principal.getName();
@@ -183,12 +246,20 @@ public class SongService {
                 });
             }
 
-            // re-link user
-            if (request.getUserId() != null) {
+            // re-link user (only admins may change owner). For non-admins attempting to change owner -> forbid
+            if (request.getUserId() != null && (securityContext == null || !securityContext.isCallerInRole(Role.ADMIN))) {
+                try {
+                    throw new Exception("Only administrators may change song owner");
+                } catch (Exception e) {
+                    // wrap into a RuntimeException so lambda can throw
+                    throw new RuntimeException(e);
+                }
+            }
+            if (request.getUserId() != null && securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
                 var oldUser = song.getUser();
                 if (oldUser != null) {
                     if (oldUser.getSongs() != null) oldUser.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
-                    userService.update(oldUser);
+                    // userService.update(oldUser);
                 }
                 userService.find(request.getUserId()).ifPresent(newUser -> {
                     if (newUser.getSongs() == null) newUser.setSongs(new ArrayList<>());
@@ -207,11 +278,14 @@ public class SongService {
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
             // authorization: only ADMIN or owner can delete
-            if (securityContext != null && !securityContext.isCallerInRole("ADMIN")) {
-                var principal = securityContext.getCallerPrincipal();
-                if (principal == null) return;
-                var login = principal.getName();
-                if (song.getUser() == null || !login.equals(song.getUser().getLogin())) return;
+            if (securityContext != null && !securityContext.isCallerInRole(Role.ADMIN)) {
+                    var principal = securityContext.getCallerPrincipal();
+                    if (principal == null) throw new RuntimeException("Access denied: not owner");
+                    var userOpt = userService.findByLogin(principal.getName());
+                    if (userOpt.isEmpty()) throw new RuntimeException("Access denied: not owner");
+                    if (song.getUser() == null || !Objects.equals(song.getUser().getId(), userOpt.get().getId())) {
+                        throw new RuntimeException("Access denied: not owner");
+                    }
             }
             // System.out.println("[DEBUG] SongService.deleteWithUnlink: deleting song " + uuid);
             Artist artist = song.getArtist();
@@ -228,7 +302,7 @@ public class SongService {
         });
     }
 
-    @RolesAllowed({Role.ADMIN, Role.USER})
+    @RolesAllowed(Role.ADMIN)
     public void deleteByArtist(UUID artistId) {
         if (artistId == null) return;
         var songs = findByArtist(artistId);

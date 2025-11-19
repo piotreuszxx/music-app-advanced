@@ -47,7 +47,7 @@
             <url-pattern>/song/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>user</role-name>
+            <role-name>USER</role-name>
         </auth-constraint>
     </security-constraint>
 
@@ -57,16 +57,16 @@
             <url-pattern>/user/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>admin</role-name>
+            <role-name>ADMINISTRATOR</role-name>
         </auth-constraint>
     </security-constraint>
 
 
     <security-role>
-        <role-name>admin</role-name>
+        <role-name>ADMINISTRATOR</role-name>
     </security-role>
 
     <security-role>
-        <role-name>user</role-name>
+        <role-name>USER</role-name>
     </security-role>
 </web-app>

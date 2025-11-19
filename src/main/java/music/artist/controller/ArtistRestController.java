@@ -1,6 +1,5 @@
 package music.artist.controller;
 
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
 import jakarta.enterprise.context.RequestScoped;
@@ -31,7 +30,7 @@ public class ArtistRestController {
     ArtistService artistService;
 
     @GET
-    @PermitAll
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Response getAllArtists() {
         List<GetArtistsResponse.Artist> all = artistService.findAllDtos();
         if(all.isEmpty()) {
@@ -42,7 +41,7 @@ public class ArtistRestController {
 
     @GET
     @Path("{id}")
-    @PermitAll
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Response getArtist(@PathParam("id") UUID id) {
         Optional<GetArtistResponse> dto = artistService.findDto(id);
         if(dto.isEmpty())

@@ -48,7 +48,7 @@ public class User implements Serializable {
 
     @ToString.Exclude//It's common to exclude lists from toString
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default
     private List<Song> songs = new ArrayList<>();
 }

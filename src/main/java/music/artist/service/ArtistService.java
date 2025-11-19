@@ -30,15 +30,18 @@ public class ArtistService {
         this.artistRepository = artistRepository;
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Optional<Artist> find(UUID id) {
         return artistRepository.find(id);
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public List<Artist> findAll() {
         return artistRepository.findAll();
     }
 
     // DTO helpers
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public List<GetArtistsResponse.Artist> findAllDtos() {
         var list = findAll();
         return list.stream().map(a -> GetArtistsResponse.Artist.builder()
@@ -47,6 +50,7 @@ public class ArtistService {
                 .build()).toList();
     }
 
+    @RolesAllowed({Role.ADMIN, Role.USER})
     public Optional<GetArtistResponse> findDto(UUID id) {
         return find(id).map(a -> {
             GetArtistResponse dto = new GetArtistResponse();

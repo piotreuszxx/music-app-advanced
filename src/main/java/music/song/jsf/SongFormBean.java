@@ -55,7 +55,7 @@ public class SongFormBean implements Serializable {
                         artistService.findDto(dto.getArtistId()).ifPresent(a -> song.setArtist(new GetArtistsResponse.Artist(a.getId(), a.getName())));
                     }
                 }
-            } catch (IllegalArgumentException ignored) {}
+            } catch (Exception ignored) {}
         } else if (artistId != null && !artistId.isBlank()) {
             try {
                 UUID aid = UUID.fromString(artistId);
@@ -102,9 +102,14 @@ public class SongFormBean implements Serializable {
                     .duration(song.getDuration())
                     .artistId(artistUuid)
                     .build();
-            boolean ok = songService.createWithLinks(putSongRequest, newSongId);
-            if (ok) return "/songs/view.xhtml?id=" + newSongId + "&faces-redirect=true";
-            else return null;
+            try {
+                boolean ok = songService.createWithLinks(putSongRequest, newSongId);
+                if (ok) return "/songs/view.xhtml?id=" + newSongId + "&faces-redirect=true";
+                else return null;
+            } catch (Exception ex) {
+                // creation failed (e.g. attempted to set owner without ADMIN) -> stay on page
+                return null;
+            }
         } else {
             // update partial
             UUID songId = song.getId();
@@ -115,9 +120,14 @@ public class SongFormBean implements Serializable {
                     .duration(song.getDuration())
                     .artistId(artistUuid)
                     .build();
-            boolean ok = songService.updatePartialWithLinks(patchSongRequest, songId);
-            if (ok) return "/songs/view.xhtml?id=" + songId + "&faces-redirect=true";
-            else return null;
+            try {
+                boolean ok = songService.updatePartialWithLinks(patchSongRequest, songId);
+                if (ok) return "/songs/view.xhtml?id=" + songId + "&faces-redirect=true";
+                else return null;
+            } catch (Exception ex) {
+                // update failed (e.g. attempted owner change without ADMIN) -> stay on page
+                return null;
+            }
         }
     }
 }

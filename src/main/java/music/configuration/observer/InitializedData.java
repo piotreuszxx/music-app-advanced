@@ -56,10 +56,10 @@ public class InitializedData {
     @SneakyThrows
     private void initData() {
         // if admin exists, assume DB already initialized -> skip seeding
-//        if (userService.findByLogin("admin").isPresent()) {
-//            System.out.println("[INFO] Data already initialized");
-//            return;
-//        }
+        if (userService.findByLogin("piotreusz").isPresent()) {
+            System.out.println("[INFO] Data already initialized");
+            return;
+        }
 //        User admin = User.builder()
 //                .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
 //                .login("admin")
@@ -154,13 +154,13 @@ public class InitializedData {
         System.out.println("[INFO] Artists initialized");
 
         // initialize and persist songs (use service to maintain relations)
-        songService.createWithLinks(new PutSongRequest("You Was Right", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000001"));
-        songService.createWithLinks(new PutSongRequest("Stay", Genre.POP, LocalDate.of(2021, 1, 1), 2.7, artist2.getId(), nicole.getId()), UUID.fromString("33333333-3333-3333-3333-000000000002"));
+        songService.createWithLinksInit(new PutSongRequest("You Was Right", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000001"));
+        songService.createWithLinksInit(new PutSongRequest("Stay", Genre.POP, LocalDate.of(2021, 1, 1), 2.7, artist2.getId(), nicole.getId()), UUID.fromString("33333333-3333-3333-3333-000000000002"));
 
-        songService.createWithLinks(new PutSongRequest("Of Course", Genre.HIPHOP, LocalDate.of(2018, 1, 1), 3.3, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000003"));
-        songService.createWithLinks(new PutSongRequest("Do What I Want", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000004"));
+        songService.createWithLinksInit(new PutSongRequest("Of Course", Genre.HIPHOP, LocalDate.of(2018, 1, 1), 3.3, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000003"));
+        songService.createWithLinksInit(new PutSongRequest("Do What I Want", Genre.HIPHOP, LocalDate.of(2016, 1, 1), 3.5, artist1.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000004"));
 
-        songService.createWithLinks(new PutSongRequest("Maybe", Genre.POP, LocalDate.of(2020, 1, 1), 3.5, artist2.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000005"));
+        songService.createWithLinksInit(new PutSongRequest("Maybe", Genre.POP, LocalDate.of(2020, 1, 1), 3.5, artist2.getId(), piotr.getId()), UUID.fromString("33333333-3333-3333-3333-000000000005"));
         System.out.println("[INFO] Songs initialized");
 
 
