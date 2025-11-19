@@ -7,6 +7,8 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.ejb.LocalBean;
 import jakarta.inject.Inject;
 import lombok.NoArgsConstructor;
+import music.artist.dto.PatchArtistRequest;
+import music.artist.dto.PutArtistRequest;
 import music.artist.entity.Artist;
 import music.artist.dto.GetArtistsResponse;
 import music.artist.dto.GetArtistResponse;
@@ -70,6 +72,32 @@ public class ArtistService {
             }
             return dto;
         });
+    }
+
+    @RolesAllowed(Role.ADMIN)
+    public boolean createIfNotExists(UUID id, PutArtistRequest req) {
+        if (find(id).isPresent()) return false;
+        Artist a = Artist.builder()
+                .id(id)
+                .name(req.getName())
+                .country(req.getCountry())
+                .debutYear(req.getDebutYear())
+                .height(req.getHeight())
+                .build();
+        create(a);
+        return true;
+    }
+
+    @RolesAllowed(Role.ADMIN)
+    public boolean patchArtist(UUID id, PatchArtistRequest req) {
+        return find(id).map(artist -> {
+            if (req.getName() != null) artist.setName(req.getName());
+            if (req.getCountry() != null) artist.setCountry(req.getCountry());
+            if (req.getDebutYear() != null) artist.setDebutYear(req.getDebutYear());
+            if (req.getHeight() != null) artist.setHeight(req.getHeight());
+            update(artist);
+            return true;
+        }).orElse(false);
     }
 
     @RolesAllowed(Role.ADMIN)

@@ -53,17 +53,8 @@ public class ArtistRestController {
     @Path("{id}")
     @RolesAllowed(Role.ADMIN)
     public Response createArtist(@PathParam("id") UUID id, PutArtistRequest req, @Context UriInfo uriInfo) {
-        if (artistService.find(id).isPresent()) {
-            return Response.status(Response.Status.CONFLICT).entity("Artist already exists").build();
-        }
-        Artist a = Artist.builder()
-                .id(id)
-                .name(req.getName())
-                .country(req.getCountry())
-                .debutYear(req.getDebutYear())
-                .height(req.getHeight())
-                .build();
-        artistService.create(a);
+        boolean created_flag = artistService.createIfNotExists(id, req);
+        if (!created_flag) return Response.status(Response.Status.CONFLICT).entity("Artist already exists").build();
         URI created = uriInfo.getAbsolutePath();
         return Response.created(created).build();
     }
@@ -72,14 +63,7 @@ public class ArtistRestController {
     @Path("{id}")
     @RolesAllowed(Role.ADMIN)
     public Response updateArtist(@PathParam("id") UUID id, PatchArtistRequest req) {
-        boolean ok = artistService.find(id).map(artist -> {
-            if (req.getName() != null) artist.setName(req.getName());
-            if (req.getCountry() != null) artist.setCountry(req.getCountry());
-            if (req.getDebutYear() != null) artist.setDebutYear(req.getDebutYear());
-            if (req.getHeight() != null) artist.setHeight(req.getHeight());
-            artistService.update(artist);
-            return true;
-        }).orElse(false);
+        boolean ok = artistService.patchArtist(id, req);
         return ok ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
     }
 
