@@ -41,22 +41,28 @@
         <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
 
+    <!-- API-level security constraints. These protect REST endpoints under /api.
+         We do NOT include /api/users/* here so the registration endpoint
+         (`PUT /api/users/{id}` annotated @PermitAll) remains public. -->
+
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>song</web-resource-name>
-            <url-pattern>/song/*</url-pattern>
+            <web-resource-name>api-artists</web-resource-name>
+            <url-pattern>/api/artists/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>USER</role-name>
+            <role-name>ADMINISTRATOR</role-name>
         </auth-constraint>
     </security-constraint>
 
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>user</web-resource-name>
-            <url-pattern>/user/*</url-pattern>
+            <web-resource-name>api-artists-songs</web-resource-name>
+            <url-pattern>/api/artists/*/songs/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
+            <role-name>USER</role-name>
             <role-name>ADMINISTRATOR</role-name>
         </auth-constraint>
     </security-constraint>
