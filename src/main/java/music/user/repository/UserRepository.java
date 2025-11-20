@@ -29,7 +29,7 @@ public class UserRepository {
     }
 
     public Optional<User> findByLogin(String login) {
-        var list = em.createQuery("SELECT u FROM User u WHERE u.login = :login", User.class)
+        List<User> list = em.createQuery("SELECT u FROM User u WHERE u.login = :login", User.class)
                 .setParameter("login", login)
                 .getResultList();
         if (list.isEmpty()) return Optional.empty();

@@ -58,7 +58,7 @@ public class UserService {
 
     // DTO helpers
     public List<GetUsersResponse.User> findAllDtos() {
-        var list = findAll();
+        List<User> list = findAll();
         return list.stream().map(u -> GetUsersResponse.User.builder()
                 .id(u.getId())
                 .login(u.getLogin())
@@ -74,7 +74,7 @@ public class UserService {
             dto.setEmail(u.getEmail());
             if (u.getSongs() != null) {
                 dto.setSongs(u.getSongs().stream().map(s -> {
-                    var small = new GetSongsResponse.Song();
+                    GetSongsResponse.Song small = new GetSongsResponse.Song();
                     small.setId(s.getId());
                     small.setTitle(s.getTitle());
                     return small;

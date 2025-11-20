@@ -14,6 +14,7 @@ import music.artist.dto.GetArtistsResponse;
 import music.artist.dto.GetArtistResponse;
 import music.song.dto.GetSongsResponse;
 import music.artist.repository.ArtistRepository;
+import music.song.entity.Song;
 import music.song.repository.SongRepository;
 import music.user.entity.Role;
 
@@ -49,7 +50,7 @@ public class ArtistService {
     // DTO helpers
     @RolesAllowed({Role.ADMIN, Role.USER})
     public List<GetArtistsResponse.Artist> findAllDtos() {
-        var list = findAll();
+        List<Artist> list = findAll();
         return list.stream().map(a -> GetArtistsResponse.Artist.builder()
                 .id(a.getId())
                 .name(a.getName())
@@ -68,7 +69,7 @@ public class ArtistService {
             // map songs as small DTOs
             if (a.getSongs() != null) {
                 dto.setSongs(a.getSongs().stream().map(s -> {
-                    var small = new GetSongsResponse.Song();
+                    GetSongsResponse.Song small = new GetSongsResponse.Song();
                     small.setId(s.getId());
                     small.setTitle(s.getTitle());
                     return small;
@@ -110,8 +111,8 @@ public class ArtistService {
     @RolesAllowed(Role.ADMIN)
     public boolean deleteArtistWithSongs(UUID artistId) {
         return find(artistId).map(artist -> {
-            var songs = songRepository.findByArtist(artistId);
-            for (var s : songs) {
+            List<Song> songs = songRepository.findByArtist(artistId);
+            for (Song s : songs) {
                 songRepository.delete(s);
             }
             delete(artistId);
@@ -126,8 +127,8 @@ public class ArtistService {
         int count = 0;
         for (Artist a : all) {
             if (a.getId() != null) {
-                var songs = songRepository.findByArtist(a.getId());
-                for (var s : songs) songRepository.delete(s);
+                List<Song> songs = songRepository.findByArtist(a.getId());
+                for (Song s : songs) songRepository.delete(s);
                 delete(a.getId());
                 count++;
             }

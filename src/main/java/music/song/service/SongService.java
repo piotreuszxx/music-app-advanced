@@ -19,6 +19,7 @@ import music.user.entity.Role;
 import music.user.entity.User;
 import music.user.service.UserService;
 
+import java.security.Principal;
 import java.util.*;
 
 @LocalBean
@@ -61,10 +62,10 @@ public class SongService {
         if (securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
             songs = songRepository.findByArtist(artistId);
         } else {
-            var principal = securityContext.getCallerPrincipal();
+            Principal principal = securityContext.getCallerPrincipal();
             if (principal == null) return List.of();
-            var login = principal.getName();
-            var userOpt = userService.findByLogin(login);
+            String login = principal.getName();
+            Optional<User> userOpt = userService.findByLogin(login);
             if (userOpt.isEmpty()) return List.of();
             songs = songRepository.findByArtistAndUser(artistId, userOpt.get().getId());
         }
@@ -81,10 +82,10 @@ public class SongService {
             return Optional.of(toFullDto(s));
         }
         // otherwise only owner may see
-        var principal = securityContext == null ? null : securityContext.getCallerPrincipal();
+        Principal principal = securityContext == null ? null : securityContext.getCallerPrincipal();
         if (principal == null) throw new RuntimeException("Access denied: not owner");
-        var login = principal.getName();
-        var userOpt = userService.findByLogin(login);
+        String login = principal.getName();
+        Optional<User> userOpt = userService.findByLogin(login);
         if (userOpt.isEmpty()) throw new RuntimeException("Access denied: not owner");
         if (s.getUser() == null || !Objects.equals(s.getUser().getId(), userOpt.get().getId())) {
             throw new RuntimeException("Access denied: not owner");
@@ -93,14 +94,14 @@ public class SongService {
     }
 
     private GetSongsResponse.Song toSmallDto(Song s) {
-        var r = new GetSongsResponse.Song();
+        GetSongsResponse.Song r = new GetSongsResponse.Song();
         r.setId(s.getId());
         r.setTitle(s.getTitle());
         return r;
     }
 
     private GetSongResponse toFullDto(Song s) {
-        var r = new GetSongResponse();
+        GetSongResponse r = new GetSongResponse();
         r.setId(s.getId());
         r.setTitle(s.getTitle());
         r.setGenre(s.getGenre());
@@ -145,7 +146,7 @@ public class SongService {
 
         // link to artist (add Song object to artist.songs)
         if (song.getArtist() != null) {
-            var artist = song.getArtist();
+            Artist artist = song.getArtist();
             if (artist.getSongs() == null) artist.setSongs(new ArrayList<>());
             artist.getSongs().add(song);
             // artistService.update(artist);
@@ -153,7 +154,7 @@ public class SongService {
 
         // link to user (add Song object to user.songs)
         if (song.getUser() != null) {
-            var user = song.getUser();
+            User user = song.getUser();
             if (user.getSongs() == null) user.setSongs(new ArrayList<>());
             user.getSongs().add(song);
             // userService.update(user);
@@ -200,7 +201,7 @@ public class SongService {
 
         // link to artist (add Song object to artist.songs)
         if (song.getArtist() != null) {
-            var artist = song.getArtist();
+            Artist artist = song.getArtist();
             if (artist.getSongs() == null) artist.setSongs(new ArrayList<>());
             artist.getSongs().add(song);
             // artistService.update(artist);
@@ -208,7 +209,7 @@ public class SongService {
 
         // link to user (add Song object to user.songs)
         if (song.getUser() != null) {
-            var user = song.getUser();
+            User user = song.getUser();
             if (user.getSongs() == null) user.setSongs(new ArrayList<>());
             user.getSongs().add(song);
             // userService.update(user);
@@ -222,9 +223,9 @@ public class SongService {
         return songRepository.find(uuid).map(song -> {
             // authorization: only ADMIN or owner can update
             if (securityContext != null && !securityContext.isCallerInRole(Role.ADMIN)) {
-                var principal = securityContext.getCallerPrincipal();
+                Principal principal = securityContext.getCallerPrincipal();
                 if (principal == null) return false;
-                var login = principal.getName();
+                String login = principal.getName();
                 if (song.getUser() == null || !login.equals(song.getUser().getLogin())) return false;
             }
             if (request.getTitle() != null) song.setTitle(request.getTitle());
@@ -233,7 +234,7 @@ public class SongService {
             if (request.getDuration() != null) song.setDuration(request.getDuration());
             // re-link artist
             if (request.getArtistId() != null) {
-                var oldArtist = song.getArtist();
+                Artist oldArtist = song.getArtist();
                 if (oldArtist != null) {
                     oldArtist.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
                     // artistService.update(oldArtist);
@@ -256,7 +257,7 @@ public class SongService {
                 }
             }
             if (request.getUserId() != null && securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
-                var oldUser = song.getUser();
+                User oldUser = song.getUser();
                 if (oldUser != null) {
                     if (oldUser.getSongs() != null) oldUser.getSongs().removeIf(s -> Objects.equals(s.getId(), song.getId()));
                     // userService.update(oldUser);
@@ -279,9 +280,9 @@ public class SongService {
         songRepository.find(uuid).ifPresent(song -> {
             // authorization: only ADMIN or owner can delete
             if (securityContext != null && !securityContext.isCallerInRole(Role.ADMIN)) {
-                    var principal = securityContext.getCallerPrincipal();
+                    Principal principal = securityContext.getCallerPrincipal();
                     if (principal == null) throw new RuntimeException("Access denied: not owner");
-                    var userOpt = userService.findByLogin(principal.getName());
+                    Optional<User> userOpt = userService.findByLogin(principal.getName());
                     if (userOpt.isEmpty()) throw new RuntimeException("Access denied: not owner");
                     if (song.getUser() == null || !Objects.equals(song.getUser().getId(), userOpt.get().getId())) {
                         throw new RuntimeException("Access denied: not owner");
@@ -305,7 +306,7 @@ public class SongService {
     @RolesAllowed(Role.ADMIN)
     public void deleteByArtist(UUID artistId) {
         if (artistId == null) return;
-        var songs = findByArtist(artistId);
+        List<Song> songs = findByArtist(artistId);
         for (Song s : songs) {
             deleteWithUnlink(s.getId());
         }
