@@ -6,7 +6,24 @@
                 template="/templates/template.xhtml">
 
     <ui:define name="content">
-        <h2>Users</h2>
-        <p>Placeholder page for users list.</p>
+        <f:event type="preRenderView" listener="#{authView.checkAdminAuth}" />
+        <h2>#{messages['users.title']}</h2>
+
+        <h:dataTable value="#{usersView.users}" var="u" styleClass="table">
+            <h:column>
+                <f:facet name="header">#{messages['users.header.login']}</f:facet>
+                #{u.login}
+            </h:column>
+            <h:column>
+                <f:facet name="header">#{messages['table.actions']}</f:facet>
+                <h:panelGroup>
+                    <h:link outcome="/users/view.xhtml" rendered="#{authView.isAdmin()}">
+                        <f:param name="id" value="#{u.id}" />
+                        #{messages['actions.view']}
+                    </h:link>
+                    <h:commandButton value="#{messages['actions.delete']}" disabled="true" action="#{usersView.delete(u.id)}" rendered="#{authView.isAdmin()}"/>
+                </h:panelGroup>
+            </h:column>
+        </h:dataTable>
     </ui:define>
 </ui:composition>

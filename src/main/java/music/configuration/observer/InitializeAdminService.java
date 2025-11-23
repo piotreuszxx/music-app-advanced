@@ -2,17 +2,14 @@ package music.configuration.observer;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
-import jakarta.ejb.Singleton;
-import jakarta.ejb.Startup;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
+import jakarta.ejb.*;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import music.user.entity.Role;
 import music.user.entity.User;
-import music.user.repository.UserRepository;
+import music.user.service.UserService;
 
 
 import java.io.IOException;
@@ -33,9 +30,11 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 public class InitializeAdminService {
 
-    private final UserRepository userRepository;
+    @EJB
+    private UserService userService;
 
-    private final Pbkdf2PasswordHash passwordHash;
+    @Inject
+    private Pbkdf2PasswordHash passwordHash;
 
     @Resource(name = "avatarDir")
     private String avatarDir;
@@ -43,14 +42,6 @@ public class InitializeAdminService {
     @Resource(name = "avatarInitDir")
     private String avatarInitDir;
 
-    @Inject
-    public InitializeAdminService(
-            UserRepository userRepository,
-            @SuppressWarnings("CdiInjectionPointsInspection") Pbkdf2PasswordHash passwordHash
-    ) {
-        this.userRepository = userRepository;
-        this.passwordHash = passwordHash;
-    }
 
     /**
      * Initializes database with some example values. Should be called after creating this object. This object should be
@@ -59,11 +50,11 @@ public class InitializeAdminService {
     @PostConstruct
     @SneakyThrows
     private void init() {
-        if (userRepository.findByLogin("admin-service").isEmpty()) {
+        if (userService.findByLogin("adminservice").isEmpty()) {
 
             User admin = User.builder()
-                    .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
-                    .login("admin-service")
+                    .id(UUID.fromString("11111111-1111-1111-0000-000000000000"))
+                    .login("adminservice")
                     .name("Admin")
                     .surname("Service")
                     .birthday(LocalDate.of(2000, 1, 1))
@@ -73,7 +64,7 @@ public class InitializeAdminService {
                     .avatar(getResourceAsByteArray("admin.png"))
                     .build();
 
-            userRepository.create(admin);
+            userService.createInit(admin);
             persistAvatarFile(admin);
         }
     }

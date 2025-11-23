@@ -3,8 +3,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f8f9fa;
-  color: #212529;
+  background: #2b2f31;
+  color: #e9ecef;
 }
 .container {
   max-width: 1000px;
@@ -21,6 +21,11 @@ body {
 .logo {
   height: 40px;
 }
+.flag {
+  height: 15px;
+  vertical-align: middle;
+  margin-left: 8px;
+}
 .main-nav ul {
   list-style: none;
   margin: 0;
@@ -30,19 +35,39 @@ body {
 }
 .main-nav .nav-link {
   text-decoration: none;
-  color: #0d6efd;
+  color: #9ecbff;
 }
+/* Keep visited links from turning browser-default purple */
+a, a:link, a:visited {
+  color: #9ecbff;
+}
+a:hover, a:focus {
+  color: #cfe9ff;
+}
+
 .content {
-  background: #fff;
+  background: #33383a;
   padding: 1rem;
   border-radius: 4px;
-  box-shadow: 0 0 4px rgba(0,0,0,0.05);
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.login-form .form-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  text-align: left;
+  color: #e9ecef;
+}
+.login-form .form-control {
+  width: 100%;
+  max-width: 360px; /* prevent inputs becoming too wide on large screens */
+  box-sizing: border-box;
 }
 .site-footer {
   margin-top: 1rem;
   padding-top: 0.5rem;
-  border-top: 1px solid #e9ecef;
-  color: #6c757d;
+  border-top: 1px solid rgba(255,255,255,0.03);
+  color: #adb5bd;
   font-size: 0.9rem;
   text-align: center;
 }

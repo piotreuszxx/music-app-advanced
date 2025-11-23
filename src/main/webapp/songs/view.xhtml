@@ -11,10 +11,11 @@
     </f:metadata>
 
     <ui:define name="content">
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
         <h2>Song details</h2>
-    <h:outputText value="Not found" rendered="#{songView.notFound}" />
+        <h:outputText value="#{messages['notfound']}" rendered="#{songView.notFound}" />
 
-    <h:panelGroup rendered="#{not songView.notFound}">
+        <h:panelGroup rendered="#{not songView.notFound}">
             <h:panelGrid columns="2">
                 <h:outputText value="Title:" />
                 <h:outputText value="#{songView.songDto.title}" />
@@ -26,14 +27,22 @@
                 <h:outputText value="#{songView.songDto.duration}" />
                 <h:outputText value="Artist:" />
                 <h:panelGroup>
-                        <h:link rendered="#{not empty songView.songDto.artistId}" outcome="/artists/view.xhtml">
-                            <f:param name="id" value="#{songView.songDto.artistId}" />
-                            #{songView.artistName}
-                        </h:link>
-                        <h:outputText rendered="#{empty songView.songDto.artistId}" value="-" />
+                    <h:link rendered="#{not empty songView.songDto.artistId}" outcome="/artists/view.xhtml">
+                        <f:param name="id" value="#{songView.songDto.artistId}" />
+                        #{songView.artistName}
+                    </h:link>
+                    <h:outputText rendered="#{empty songView.songDto.artistId}" value="-" />
                 </h:panelGroup>
             </h:panelGrid>
-        </h:panelGroup>
 
+                <h:form>
+                <h:commandButton value="#{messages['actions.delete']}" action="#{songView.delete}" rendered="#{authView.isAdmin() or authView.isOwner(songView.songDto.userId)}"/>
+                &#160;
+                <h:link outcome="/songs/form.xhtml" rendered="#{authView.isAdmin() or authView.isOwner(songView.songDto.userId)}">
+                    <f:param name="id" value="#{songView.id}" />
+                    #{messages['actions.edit']}
+                </h:link>
+            </h:form>
+        </h:panelGroup>
     </ui:define>
 </ui:composition>

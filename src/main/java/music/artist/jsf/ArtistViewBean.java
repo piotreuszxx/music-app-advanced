@@ -13,6 +13,8 @@ import music.song.service.SongService;
 
 import java.util.List;
 import java.util.Optional;
+import jakarta.faces.context.FacesContext;
+import music.user.entity.Role;
 import java.util.UUID;
 
 @Named("artistView")
@@ -61,25 +63,30 @@ public class ArtistViewBean implements Serializable {
     }
 
 
-    public String deleteSelectedSong() {
-        if (songToDeleteId == null) return null;
+    public void deleteSelectedSong() {
+        if (songToDeleteId == null) return;
         try {
             UUID sid = UUID.fromString(songToDeleteId);
             songService.deleteWithUnlink(sid);
-            // clear selection and refresh view
+            // clear selection so getter will reflect removal
             songToDeleteId = null;
-            return "/artists/view.xhtml?id=" + id + "&faces-redirect=true";
         } catch (IllegalArgumentException e) {
-            return null;
+            // ignore invalid id
         } catch (Exception e) {
-            // deletion forbidden or failed - stay on page
-            return null;
+            // deletion forbidden or failed - ignore, view will not change
         }
     }
 
     public String deleteArtist(String artistId) {
         if (artistId == null) return null;
         try {
+            FacesContext fc = FacesContext.getCurrentInstance();
+            if (fc != null && !fc.getExternalContext().isUserInRole(Role.ADMIN)) {
+                try {
+                    fc.getExternalContext().redirect(fc.getExternalContext().getRequestContextPath() + "/403.xhtml");
+                } catch (Exception ignored) {}
+                return null;
+            }
             UUID aid = UUID.fromString(artistId);
             // delete songs first
             songService.deleteByArtist(aid);

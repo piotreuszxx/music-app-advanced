@@ -12,7 +12,8 @@
     </f:metadata>
 
     <ui:define name="content">
-        <h2>Song form</h2>
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
+        <h2>#{messages['song.form.title']}</h2>
 
         <h:form>
             <h:panelGrid columns="2">
@@ -36,8 +37,8 @@
                     </h:selectOneMenu>
             </h:panelGrid>
 
-            <h:commandButton value="Save" action="#{songForm.save}" />
-            <h:commandButton value="Cancel" action="/artists/list.xhtml?faces-redirect=true" immediate="true" />
+            <h:commandButton value="#{messages['form.save']}" action="#{songForm.save}" />
+            <h:commandButton value="#{messages['form.cancel']}" action="/artists/list.xhtml?faces-redirect=true" immediate="true" />
         </h:form>
     </ui:define>
 </ui:composition>

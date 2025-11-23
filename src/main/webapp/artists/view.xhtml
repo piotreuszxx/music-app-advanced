@@ -11,58 +11,64 @@
     </f:metadata>
 
     <ui:define name="content">
-        <h2>Artist details</h2>
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
+        <h2>#{messages['artists.view.title']}</h2>
 
-        <h:outputText value="Not found" rendered="#{artistView.notFound}" />
+        <h:outputText value="#{messages['notfound']}" rendered="#{artistView.notFound}" />
 
         <h:panelGroup rendered="#{not artistView.notFound}">
-            <h:panelGrid columns="2">
-                <h:outputText value="Name:" />
-                  <h:outputText value="#{artistView.artistDto.name}" />
-                <h:outputText value="Country:" />
-                  <h:outputText value="#{artistView.artistDto.country}" />
-                <h:outputText value="Debut:" />
-                  <h:outputText value="#{artistView.artistDto.debutYear}" />
-                <h:outputText value="Height:" />
-                  <h:outputText value="#{artistView.artistDto.height}" />
-            </h:panelGrid>
+                                <h:panelGrid columns="2">
+                                <h:outputText value="#{messages['artist.field.name']}" />
+                                    <h:outputText value="#{artistView.artistDto.name}" />
+                                <h:outputText value="#{messages['artist.field.country']}" />
+                                    <h:outputText value="#{artistView.artistDto.country}" />
+                                <h:outputText value="#{messages['artist.field.debut']}" />
+                                    <h:outputText value="#{artistView.artistDto.debutYear}" />
+                                <h:outputText value="#{messages['artist.field.height']}" />
+                                    <h:outputText value="#{artistView.artistDto.height}" />
+                        </h:panelGrid>
 
             <h:form>
-                <h:commandButton value="Delete artist" action="#{artistView.deleteArtist(artistView.id)}"/>
+                <h:commandButton value="#{messages['artist.delete']}" action="#{artistView.deleteArtist(artistView.id)}" rendered="#{authView.isAdmin()}"/>
             </h:form>
-
+                <h:link outcome="/artists/form.xhtml" rendered="#{authView.isAdmin()}">
+                    <f:param name="id" value="#{artistView.id}" />
+                    #{messages['artist.edit']}
+                </h:link>
             <h:form>
-                <h:link outcome="/songs/form.xhtml" value="Add song">
+                <h:link outcome="/songs/form.xhtml" value="#{messages['song.add']}" rendered="#{not empty request.userPrincipal}">
                     <f:param name="artistId" value="#{artistView.id}" />
                 </h:link>
             </h:form>
 
-            <h3>Songs</h3>
-            <h:form>
+            <h3>#{messages['artist.songs.header']}</h3>
+                <h:form id="songsForm">
                     <h:inputHidden id="artistId" value="#{artistView.id}" />
-                    <h:dataTable value="#{artistView.songs}" var="song">
+                    <h:messages id="messages" />
+                    <h:dataTable id="songsTable" value="#{artistView.songs}" var="song">
                     <h:column>
-                        <f:facet name="header">Title</f:facet>
+                        <f:facet name="header">#{messages['song.field.title']}</f:facet>
                         #{song.title}
                     </h:column>
                     <h:column>
-                        <f:facet name="header">View</f:facet>
+                        <f:facet name="header">#{messages['song.field.artist']}</f:facet>
                         <h:link outcome="/songs/view.xhtml">
                             <f:param name="id" value="#{song.id}" />
-                            View
+                            #{messages['actions.view']}
                         </h:link>
                     </h:column>
                     <h:column>
-                        <f:facet name="header">Edit</f:facet>
-                        <h:link outcome="/songs/form.xhtml">
+                        <f:facet name="header">#{messages['actions.edit']}</f:facet>
+                        <h:link outcome="/songs/form.xhtml" rendered="#{authView.isAdmin() or authView.isOwner(song.userId)}">
                             <f:param name="id" value="#{song.id}" />
-                            Edit
+                            #{messages['actions.edit']}
                         </h:link>
                     </h:column>
                     <h:column>
-                        <f:facet name="header">Actions</f:facet>
-                        <h:commandButton value="Delete" action="#{artistView.deleteSelectedSong}">
+                        <f:facet name="header">#{messages['table.actions']}</f:facet>
+                        <h:commandButton value="#{messages['actions.delete']}" action="#{artistView.deleteSelectedSong}" rendered="#{authView.isAdmin() or authView.isOwner(song.userId)}">
                             <f:setPropertyActionListener target="#{artistView.songToDeleteId}" value="#{song.id.toString()}" />
+                            <f:ajax execute="@this" render="songsTable messages" />
                         </h:commandButton>
                     </h:column>
                 </h:dataTable>

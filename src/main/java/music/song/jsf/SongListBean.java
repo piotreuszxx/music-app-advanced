@@ -17,7 +17,7 @@ public class SongListBean {
     SongService songService;
 
     public List<Song> getSongs() {
-        return songService.findAll();
+        return songService.findForCurrentUser();
     }
 
     public String delete(UUID id) {

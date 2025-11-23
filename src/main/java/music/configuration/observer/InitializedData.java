@@ -60,17 +60,17 @@ public class InitializedData {
             System.out.println("[INFO] Data already initialized");
             return;
         }
-//        User admin = User.builder()
-//                .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
-//                .login("admin")
-//                .name("System")
-//                .surname("Admin")
-//                .birthday(LocalDate.of(2000, 1, 1))
-//                .email("admin@simplerpg.example.com")
-//                .password(passwordHash.generate("admin123".toCharArray()))
-//                .roles(List.of(Role.ADMIN, Role.USER))
-//                .avatar(getResourceAsByteArray("admin.png"))
-//                .build();
+        User admin = User.builder()
+                .id(UUID.fromString("11111111-1111-1111-1111-000000000000"))
+                .login("admin")
+                .name("System")
+                .surname("Admin")
+                .birthday(LocalDate.of(2000, 1, 1))
+                .email("admin@simplerpg.example.com")
+                .password(passwordHash.generate("admin123".toCharArray()))
+                .roles(List.of(Role.ADMIN, Role.USER))
+                .avatar(getResourceAsByteArray("admin.png"))
+                .build();
 
         User piotr = User.builder()
                 .id(UUID.fromString("11111111-1111-1111-1111-000000000001"))
@@ -120,8 +120,8 @@ public class InitializedData {
                 .avatar(null)
                 .build();
 
-//        userService.create(admin);
-//        persistAvatarFile(admin);
+        userService.create(admin);
+        persistAvatarFile(admin);
         userService.create(piotr);
         persistAvatarFile(piotr);
         userService.create(nicole);

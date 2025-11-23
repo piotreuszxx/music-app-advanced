@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{artistForm.id}" />
+        <f:viewAction action="#{artistForm.init}" />
+    </f:metadata>
+
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{authView.checkAdminAuth}" />
+        <h2>#{messages['artist.form.title']}</h2>
+
+        <h:form>
+            <h:panelGrid columns="2">
+                <h:outputText value="#{messages['artist.field.name']}" />
+                <h:inputText value="#{artistForm.name}" />
+
+                <h:outputText value="#{messages['artist.field.country']}" />
+                <h:inputText value="#{artistForm.country}" />
+
+                <h:outputText value="#{messages['artist.field.debut']}" />
+                <h:inputText value="#{artistForm.debutYear}" />
+
+                <h:outputText value="#{messages['artist.field.height']}" />
+                <h:inputText value="#{artistForm.height}" />
+            </h:panelGrid>
+
+            <h:commandButton value="#{messages['form.save']}" action="#{artistForm.save}" />
+            <h:commandButton value="#{messages['form.cancel']}" action="/artists/list.xhtml?faces-redirect=true" immediate="true" />
+        </h:form>
+    </ui:define>
+</ui:composition>

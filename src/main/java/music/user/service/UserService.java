@@ -89,6 +89,11 @@ public class UserService {
         userRepository.create(user);
     }
 
+    // used only in initialization
+    public void createInit(User user) {
+        userRepository.create(user);
+    }
+
     @PermitAll
     public boolean createFromRequest(PutUserRequest request, UUID uuid) {
         if (find(uuid).isPresent()) return false;

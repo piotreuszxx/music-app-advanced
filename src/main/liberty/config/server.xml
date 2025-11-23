@@ -16,7 +16,7 @@
         <application-bnd>
             <security-role name="ADMINISTRATOR">
                 <group name="ADMINISTRATOR" access-id="group:jdbc/MusicDb/ADMINISTRATOR"/>
-                <run-as userid="admin-service"/>
+                <run-as userid="adminservice"/>
             </security-role>
             <security-role name="USER">
                 <group name="USER" access-id="group:jdbc/MusicDb/USER"/>

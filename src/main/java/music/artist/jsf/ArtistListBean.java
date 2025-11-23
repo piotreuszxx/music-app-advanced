@@ -24,13 +24,11 @@ public class ArtistListBean {
         return artistService.findAllDtos();
     }
 
-    public String delete(UUID id) {
+    public void delete(UUID id) {
         if (id != null) {
             // delete songs belonging to artist first
             songService.deleteByArtist(id);
             artistService.delete(id);
         }
-        // redirect to the same list page
-        return "/artists/list.xhtml?faces-redirect=true";
     }
 }

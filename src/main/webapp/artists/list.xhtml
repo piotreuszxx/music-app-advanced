@@ -6,21 +6,24 @@
                 template="/templates/template.xhtml">
 
     <ui:define name="content">
-        <h2>Artists</h2>
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
+        <h2>#{messages['artists.title']}</h2>
 
-        <h:form>
-            <h:dataTable value="#{artistList.artists}" var="artist">
+        <h:form id="artistsForm">
+            <h:dataTable id="artistsTable" value="#{artistList.artists}" var="artist">
                 <h:column>
-                    <f:facet name="header">Name</f:facet>
+                    <f:facet name="header">#{messages['artists.header.name']}</f:facet>
                     #{artist.name}
                 </h:column>
                 <h:column>
-                    <f:facet name="header">Actions</f:facet>
-                    <h:link outcome="/artists/view.xhtml" value="View">
+                    <f:facet name="header">#{messages['table.actions']}</f:facet>
+                    <h:link outcome="/artists/view.xhtml" value="#{messages['actions.view']}">
                         <f:param name="id" value="#{artist.id}"/>
                     </h:link>
                     &#160;
-                    <h:commandButton value="Delete" action="#{artistList.delete(artist.id)}"/>
+                        <h:commandButton value="#{messages['actions.delete']}" action="#{artistList.delete(artist.id)}" rendered="#{authView.isAdmin()}">
+                            <f:ajax execute="@this" render="artistsTable" />
+                        </h:commandButton>
                 </h:column>
             </h:dataTable>
         </h:form>

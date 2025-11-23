@@ -3,6 +3,7 @@ package music.song.jsf;
 import jakarta.ejb.EJB;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
+import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,8 +55,28 @@ public class SongFormBean implements Serializable {
                     if (dto.getArtistId() != null) {
                         artistService.findDto(dto.getArtistId()).ifPresent(a -> song.setArtist(new GetArtistsResponse.Artist(a.getId(), a.getName())));
                     }
+                } else {
+                    // not found or access denied -> redirect to 404
+                    FacesContext fc = FacesContext.getCurrentInstance();
+                    if (fc != null) {
+                        try {
+                            fc.getExternalContext().redirect(fc.getExternalContext().getRequestContextPath() + "/404.xhtml");
+                        } catch (Exception e) {
+                            // ignore redirect failure
+                        }
+                    }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                // treat exception (e.g. access denied) as not found -> redirect to 404
+                FacesContext fc = FacesContext.getCurrentInstance();
+                if (fc != null) {
+                    try {
+                        fc.getExternalContext().redirect(fc.getExternalContext().getRequestContextPath() + "/404.xhtml");
+                    } catch (Exception ex) {
+                        // ignore
+                    }
+                }
+            }
         } else if (artistId != null && !artistId.isBlank()) {
             try {
                 UUID aid = UUID.fromString(artistId);

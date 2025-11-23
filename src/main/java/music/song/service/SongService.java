@@ -83,12 +83,12 @@ public class SongService {
         }
         // otherwise only owner may see
         Principal principal = securityContext == null ? null : securityContext.getCallerPrincipal();
-        if (principal == null) throw new RuntimeException("Access denied: not owner");
+        if (principal == null) return Optional.empty();
         String login = principal.getName();
         Optional<User> userOpt = userService.findByLogin(login);
-        if (userOpt.isEmpty()) throw new RuntimeException("Access denied: not owner");
+        if (userOpt.isEmpty()) return Optional.empty();
         if (s.getUser() == null || !Objects.equals(s.getUser().getId(), userOpt.get().getId())) {
-            throw new RuntimeException("Access denied: not owner");
+            return Optional.empty();
         }
         return Optional.of(toFullDto(s));
     }
@@ -97,7 +97,20 @@ public class SongService {
         GetSongsResponse.Song r = new GetSongsResponse.Song();
         r.setId(s.getId());
         r.setTitle(s.getTitle());
+        r.setUserId(s.getUser() == null ? null : s.getUser().getId());
         return r;
+    }
+
+    @RolesAllowed({Role.ADMIN, Role.USER})
+    public List<Song> findForCurrentUser() {
+        if (securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
+            return songRepository.findAll();
+        }
+        Principal principal = securityContext == null ? null : securityContext.getCallerPrincipal();
+        if (principal == null) return List.of();
+        Optional<User> userOpt = userService.findByLogin(principal.getName());
+        if (userOpt.isEmpty()) return List.of();
+        return songRepository.findByUser(userOpt.get().getId());
     }
 
     private GetSongResponse toFullDto(Song s) {

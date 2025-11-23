@@ -24,6 +24,7 @@ public class GetSongsResponse {
     public static class Song {
         private UUID id;
         private String title;
+        private UUID userId;
     }
 
     @Singular

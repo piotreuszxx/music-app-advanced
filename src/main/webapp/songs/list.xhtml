@@ -6,15 +6,16 @@
                 template="/templates/template.xhtml">
 
     <ui:define name="content">
-        <h2>Songs</h2>
+        <f:event type="preRenderView" listener="#{authView.checkAuth}" />
+        <h2>#{messages['songs.title']}</h2>
         <h:form>
             <h:dataTable value="#{songList.songs}" var="song">
                 <h:column>
-                    <f:facet name="header">Title</f:facet>
+                    <f:facet name="header">#{messages['song.field.title']}</f:facet>
                     #{song.title}
                 </h:column>
                 <h:column>
-                    <f:facet name="header">Artist</f:facet>
+                    <f:facet name="header">#{messages['song.field.artist']}</f:facet>
                     <h:panelGroup>
                         <h:link rendered="#{not empty song.artist}" outcome="/artists/view.xhtml">
                             <f:param name="id" value="#{song.artist.id}" />
@@ -24,13 +25,13 @@
                     </h:panelGroup>
                 </h:column>
                 <h:column>
-                    <f:facet name="header">Actions</f:facet>
+                    <f:facet name="header">#{messages['table.actions']}</f:facet>
                     <h:link outcome="/songs/view.xhtml">
                         <f:param name="id" value="#{song.id}" />
-                        View
+                        #{messages['actions.view']}
                     </h:link>
                     &#160;
-                    <h:commandButton value="Delete" action="#{songList.delete(song.id)}" />
+                    <h:commandButton value="#{messages['actions.delete']}" action="#{songList.delete(song.id)}" rendered="#{authView.isAdmin() or authView.isOwner(song.user.id)}" />
                 </h:column>
             </h:dataTable>
         </h:form>

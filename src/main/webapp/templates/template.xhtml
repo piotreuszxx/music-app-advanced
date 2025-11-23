@@ -5,10 +5,10 @@
 		xmlns:ui="jakarta.faces.facelets"
 		xmlns:f="jakarta.faces.core">
 	<f:view>
-		<h:head>
+			<h:head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>Music App Advanced</title>
+			<title>#{messages['title']}</title>
 
 			<h:outputStylesheet library="css" name="main.css"/>
 		</h:head>
@@ -17,26 +17,50 @@
 			<div class="container">
 				<header class="site-header">
 					<div class="brand">
-						<h:graphicImage library="images" name="logo.svg" styleClass="logo" alt="Music App logo"/>
+						<h:graphicImage library="images" name="#{messages['header.logo']}" styleClass="logo" alt="#{messages['title']}"/>
+						<h:graphicImage library="images" name="#{messages['header.flag']}" styleClass="flag" alt="lang"/>
 					</div>
-					<div class="tagline">A simple Jakarta EE / JSF frontend</div>
+					<div class="tagline">#{messages['tagline']}</div>
+					<div class="auth">
+						<h:panelGroup rendered="#{not empty request.userPrincipal}">
+							<h:outputText value="#{messages['hello']}, " />
+							<h:outputText value="#{request.userPrincipal.name}" />
+							<h:form>
+								<h:commandButton value="#{messages['logout']}" action="#{logoutBean.logout}" styleClass="btn btn-link" />
+							</h:form>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{empty request.userPrincipal}">
+							<h:link outcome="/authentication/custom/login.xhtml" value="#{messages['login']}"/>
+						</h:panelGroup>
+					</div>
 				</header>
 
 				<nav class="main-nav">
 					<ul>
-						<li><h:link outcome="/index.xhtml" value="Home" styleClass="nav-link"/></li>
-						<li><h:link outcome="/artists/list.xhtml" value="Artists" styleClass="nav-link"/></li>
-						<!-- songs and users lists temporarily hidden from navigation, keeping for possible later use -->
-						<!-- <li><h:link outcome="/songs/list.xhtml" value="Songs" styleClass="nav-link"/></li> -->
-						<!-- <li><h:link outcome="/users/list.xhtml" value="Users" styleClass="nav-link"/></li> -->
+						<li><h:link outcome="/index.xhtml" value="#{messages['nav.home']}" styleClass="nav-link"/></li>
+						<li>
+							<h:panelGroup rendered="#{not empty request.userPrincipal}">
+								<h:link outcome="/artists/list.xhtml" value="#{messages['nav.artists']}" styleClass="nav-link"/>
+							</h:panelGroup>
+						</li>
+						<li>
+							<h:panelGroup rendered="#{not empty request.userPrincipal}">
+								<h:link outcome="/songs/list.xhtml" value="#{messages['nav.songs']}" styleClass="nav-link"/>
+							</h:panelGroup>
+						</li>
+						<li>
+							<h:panelGroup rendered="#{authView.isAdmin()}">
+								<h:link outcome="/users/list.xhtml" value="#{messages['nav.users']}" styleClass="nav-link"/>
+							</h:panelGroup>
+						</li>
 					</ul>
 				</nav>
 
 				<main class="content">
 					<ui:insert name="content">
 						<h:panelGroup>
-							<h2>Welcome</h2>
-							<p>This is the Music App Advanced. Please use the navigation to continue.</p>
+							<h2>#{messages['welcome.title']}</h2>
+							<p>#{messages['welcome.body']}</p>
 						</h:panelGroup>
 					</ui:insert>
 				</main>

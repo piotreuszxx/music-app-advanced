@@ -7,8 +7,8 @@
 ### GET users
 # @no-cookie-jar
 GET http://localhost:9080/music-app-advanced/api/users
-#Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
-Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
+Authorization: Basic YWRtaW4tc2VydmljZTphZG1pbjEyMw== # admin-service:admin123
+#Authorization: Basic cGlvdHJldXN6OnBpb3RyMTIz       # piotreusz:piotr123
 
 ### GET user by id (existing)
 # @no-cookie-jar

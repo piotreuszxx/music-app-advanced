@@ -1,6 +1,7 @@
 package music.song.jsf;
 
 import jakarta.ejb.EJB;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import lombok.Getter;
@@ -34,6 +35,17 @@ public class SongViewBean implements Serializable {
     private boolean notFound = false;
     private GetArtistResponse artist;
 
+    public String delete() {
+        if (song == null || song.getId() == null) return null;
+        try {
+            java.util.UUID uuid = song.getId();
+            songService.deleteWithUnlink(uuid);
+            return "/songs/list.xhtml?faces-redirect=true";
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public void init() {
         if (id != null) {
             try {
@@ -44,7 +56,24 @@ public class SongViewBean implements Serializable {
                 if (song != null && song.getArtistId() != null) {
                     artist = artistService.findDto(song.getArtistId()).orElse(null);
                 }
-            } catch (Exception ignored) {
+                if (notFound) {
+                    FacesContext fc = FacesContext.getCurrentInstance();
+                    if (fc != null) {
+                        try {
+                            fc.getExternalContext().redirect(fc.getExternalContext().getRequestContextPath() + "/404.xhtml");
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                notFound = true;
+                FacesContext fc = FacesContext.getCurrentInstance();
+                if (fc != null) {
+                    try {
+                        fc.getExternalContext().redirect(fc.getExternalContext().getRequestContextPath() + "/404.xhtml");
+                    } catch (Exception ex) {
+                    }
+                }
             }
         }
     }

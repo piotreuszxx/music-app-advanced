@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                template="/templates/template.xhtml">
+
+    <ui:define name="content">
+        <article class="text--justified">
+            <header><h2>#{messages['login.title']}</h2></header>
+            <section>
+                <h:form styleClass="container login-form" action="j_security_check" onreset="onReset()" method="post">
+                    <div class="row">
+                        <div class="col-4 p-2">
+                            <div class="form-outline">
+                                <h:outputLabel for="username" styleClass="form-label" value="#{messages['login.username']}"/>
+                                <h:inputText id="username" name="j_username" type="text" styleClass="form-control" value="#{userLogin.login}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4 p-2">
+                            <div class="form-outline">
+                                <h:outputLabel for="password" class="form-label" value="#{messages['login.password']}"/>
+                                <h:inputSecret id="password" name="j_password" styleClass="form-control" value="#{userLogin.password}"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-2 p-2 text-center">
+                            <h:commandButton styleClass="btn btn-primary" type="submit" value="#{messages['login.submit']}" action="#{userLogin.loginAction()}"/>
+                        </div>
+                        <div class="col-2 p-2 text-center">
+                            <h:commandButton styleClass="btn btn-secondary" type="reset" value="#{messages['login.reset']}"/>
+                        </div>
+                    </div>
+                </h:form>
+            </section>
+        </article>
+    </ui:define>
+
+</ui:composition>
