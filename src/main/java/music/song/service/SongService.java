@@ -21,6 +21,7 @@ import music.user.service.UserService;
 
 import java.security.Principal;
 import java.util.*;
+import music.configuration.interceptor.binding.LogAccess;
 
 @LocalBean
 @Stateless
@@ -126,16 +127,19 @@ public class SongService {
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    @LogAccess("CREATE_SONG")
     public void create(Song song) {
         songRepository.create(song);
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    @LogAccess("UPDATE_SONG")
     public void update(Song song) {
         songRepository.update(song);
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    @LogAccess("DELETE_SONG")
     public void delete(UUID id) {
         songRepository.find(id).ifPresent(songRepository::delete);
     }
@@ -177,6 +181,7 @@ public class SongService {
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    @LogAccess("CREATE_SONG")
     public boolean createWithLinks(PutSongRequest request, UUID uuid) throws Exception {
         if (songRepository.find(uuid).isPresent()) return false;
         Song song = Song.builder()
@@ -232,6 +237,7 @@ public class SongService {
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    @LogAccess("UPDATE_SONG")
     public boolean updatePartialWithLinks(PatchSongRequest request, UUID uuid) throws Exception {
         return songRepository.find(uuid).map(song -> {
             // authorization: only ADMIN or owner can update
@@ -289,6 +295,7 @@ public class SongService {
     }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
+    @LogAccess("DELETE_SONG")
     public void deleteWithUnlink(UUID uuid) {
         songRepository.find(uuid).ifPresent(song -> {
             // authorization: only ADMIN or owner can delete

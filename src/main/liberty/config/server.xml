@@ -12,6 +12,8 @@
         <feature>appSecurity-5.0</feature>
     </featureManager>
 
+    <logging consoleLogLevel="INFO"/>
+
     <application type="war" location="music-app-advanced-1.0-SNAPSHOT.war">
         <application-bnd>
             <security-role name="ADMINISTRATOR">

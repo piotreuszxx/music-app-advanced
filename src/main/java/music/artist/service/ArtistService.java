@@ -21,6 +21,7 @@ import music.user.entity.Role;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import music.configuration.interceptor.binding.LogAccess;
 
 @LocalBean
 @Stateless
@@ -80,6 +81,7 @@ public class ArtistService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("CREATE_ARTIST")
     public boolean createIfNotExists(UUID id, PutArtistRequest req) {
         if (find(id).isPresent()) return false;
         Artist a = Artist.builder()
@@ -94,6 +96,7 @@ public class ArtistService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("UPDATE_ARTIST")
     public boolean patchArtist(UUID id, PatchArtistRequest req) {
         return find(id).map(artist -> {
             if (req.getName() != null) artist.setName(req.getName());
@@ -109,6 +112,7 @@ public class ArtistService {
      * Delete artist and all their songs using repositories (no cross-service injection).
      */
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("DELETE_ARTIST")
     public boolean deleteArtistWithSongs(UUID artistId) {
         return find(artistId).map(artist -> {
             List<Song> songs = songRepository.findByArtist(artistId);
@@ -121,6 +125,7 @@ public class ArtistService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("DELETE_ARTIST")
     public int deleteAllArtistsWithSongs() {
         List<Artist> all = findAll();
         if (all.isEmpty()) return 0;
@@ -137,16 +142,19 @@ public class ArtistService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("CREATE_ARTIST")
     public void create(Artist artist) {
         artistRepository.create(artist);
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("UPDATE_ARTIST")
     public void update(Artist artist) {
         artistRepository.update(artist);
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("DELETE_ARTIST")
     public void delete(UUID id) {
         artistRepository.find(id).ifPresent(artistRepository::delete);
     }

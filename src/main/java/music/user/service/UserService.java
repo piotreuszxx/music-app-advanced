@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import music.configuration.interceptor.binding.LogAccess;
 
 @LocalBean
 @Stateless
@@ -85,16 +86,19 @@ public class UserService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("CREATE_USER")
     public void create(User user) {
         userRepository.create(user);
     }
 
     // used only in initialization
+    @LogAccess("CREATE_USER")
     public void createInit(User user) {
         userRepository.create(user);
     }
 
     @PermitAll
+    @LogAccess("CREATE_USER")
     public boolean createFromRequest(PutUserRequest request, UUID uuid) {
         if (find(uuid).isPresent()) return false;
         User newUser = User.builder()
@@ -113,11 +117,13 @@ public class UserService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("UPDATE_USER")
     public void update(User user) {
         userRepository.update(user);
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("UPDATE_USER")
     public boolean updatePartial(PatchUserRequest request, UUID uuid) {
         return find(uuid)
                 .map(user -> {
@@ -133,6 +139,7 @@ public class UserService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("DELETE_USER")
     public void delete(UUID id) {
         deleteAvatarFile(id.toString() + ".png");
         userRepository.delete(userRepository.find(id).orElseThrow());
@@ -149,6 +156,7 @@ public class UserService {
     }
 
     @RolesAllowed(Role.ADMIN)
+    @LogAccess("UPDATE_USER_AVATAR")
     public boolean updateAvatar(UUID id, byte[] avatarBytes) {
         return userRepository.find(id).map(user -> {
             user.setAvatar(avatarBytes);
@@ -158,6 +166,7 @@ public class UserService {
         }).orElse(false);
     }
 
+    @LogAccess("DELETE_USER_AVATAR")
     public boolean deleteAvatar(UUID id) {
         return userRepository.find(id).map(user -> {
             boolean hasDbAvatar = user.getAvatar() != null;
