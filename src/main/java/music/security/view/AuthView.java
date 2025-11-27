@@ -38,7 +38,7 @@ public class AuthView {
         if (fc == null) return null;
         Principal p = fc.getExternalContext().getUserPrincipal();
         if (p == null) return null;
-        java.util.Optional<music.user.entity.User> u = userService.findByLogin(p.getName());
+        Optional<music.user.entity.User> u = userService.findByLogin(p.getName());
         if (u.isEmpty()) return null;
         return u.get().getId();
     }

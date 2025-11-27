@@ -47,7 +47,7 @@ public class UserLogin {
         AuthenticationStatus status = securityContext.authenticate(request, response, withParams().credential(credential));
 
         var caller = securityContext.getCallerPrincipal();
-        boolean isAdminRole = request.isUserInRole(Role.ADMIN); // zweryfikuj nazwę roli
+        boolean isAdminRole = request.isUserInRole(Role.ADMIN);
         System.out.println("Auth status: " + status + ", principal: " + caller + ", isAdminRole: " + isAdminRole);
         if (status == AuthenticationStatus.SUCCESS) {
             facesContext.getExternalContext().redirect(facesContext.getExternalContext().getRequestContextPath() + "/index.xhtml");

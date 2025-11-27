@@ -44,7 +44,6 @@
             <h3>#{messages['artist.songs.header']}</h3>
                 <h:form id="songsForm">
                     <h:inputHidden id="artistId" value="#{artistView.id}" />
-                    <h:messages id="messages" />
                     <h:dataTable id="songsTable" value="#{artistView.songs}" var="song">
                     <h:column>
                         <f:facet name="header">#{messages['song.field.title']}</f:facet>
@@ -68,7 +67,7 @@
                         <f:facet name="header">#{messages['table.actions']}</f:facet>
                         <h:commandButton value="#{messages['actions.delete']}" action="#{artistView.deleteSelectedSong}" rendered="#{authView.isAdmin() or authView.isOwner(song.userId)}">
                             <f:setPropertyActionListener target="#{artistView.songToDeleteId}" value="#{song.id.toString()}" />
-                            <f:ajax execute="@this" render="songsTable messages" />
+                            <f:ajax execute="@this" render="songsTable" />
                         </h:commandButton>
                     </h:column>
                 </h:dataTable>
