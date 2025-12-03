@@ -4,6 +4,9 @@ package music.artist.repository;
 import jakarta.enterprise.context.Dependent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import music.artist.entity.Artist;
 
 import java.util.List;
@@ -25,7 +28,11 @@ public class ArtistRepository {
     }
 
     public List<Artist> findAll() {
-        return em.createQuery("SELECT a FROM Artist a", Artist.class).getResultList();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Artist> cq = cb.createQuery(Artist.class);
+        Root<Artist> root = cq.from(Artist.class);
+        cq.select(root);
+        return em.createQuery(cq).getResultList();
     }
 
     public void create(Artist artist) {

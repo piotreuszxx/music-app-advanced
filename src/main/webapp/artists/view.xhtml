@@ -50,6 +50,18 @@
                         #{song.title}
                     </h:column>
                     <h:column>
+                        <f:facet name="header">#{messages['song.field.created']} <small>(#{messages['song.field.tz']})</small></f:facet>
+                        <h:outputText value="#{song.createdAt}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">#{messages['song.field.updated']} <small>(#{messages['song.field.tz']})</small></f:facet>
+                        <h:outputText value="#{song.updatedAt}">
+                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
                         <f:facet name="header">#{messages['song.field.artist']}</f:facet>
                         <h:link outcome="/songs/view.xhtml">
                             <f:param name="id" value="#{song.id}" />

@@ -21,6 +21,8 @@ import music.user.service.UserService;
 
 import java.security.Principal;
 import java.util.*;
+import java.time.ZoneId;
+import java.util.Date;
 import music.configuration.interceptor.binding.LogAccess;
 
 @LocalBean
@@ -99,6 +101,9 @@ public class SongService {
         r.setId(s.getId());
         r.setTitle(s.getTitle());
         r.setUserId(s.getUser() == null ? null : s.getUser().getId());
+        ZoneId displayZone = ZoneId.of("Europe/Warsaw");
+        if (s.getCreatedAt() != null) r.setCreatedAt(Date.from(s.getCreatedAt().plusHours(1).atZone(displayZone).toInstant()));
+        if (s.getUpdatedAt() != null) r.setUpdatedAt(Date.from(s.getUpdatedAt().plusHours(1).atZone(displayZone).toInstant()));
         return r;
     }
 
@@ -123,6 +128,9 @@ public class SongService {
         r.setDuration(s.getDuration());
         r.setArtistId(s.getArtist() == null ? null : s.getArtist().getId());
         r.setUserId(s.getUser() == null ? null : s.getUser().getId());
+        ZoneId displayZone = ZoneId.of("Europe/Warsaw");
+        if (s.getCreatedAt() != null) r.setCreatedAt(Date.from(s.getCreatedAt().plusHours(1).atZone(displayZone).toInstant()));
+        if (s.getUpdatedAt() != null) r.setUpdatedAt(Date.from(s.getUpdatedAt().plusHours(1).atZone(displayZone).toInstant()));
         return r;
     }
 

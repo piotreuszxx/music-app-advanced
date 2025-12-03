@@ -4,6 +4,10 @@ package music.song.repository;
 import jakarta.enterprise.context.Dependent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import music.song.entity.Song;
 
 import java.util.List;
@@ -25,29 +29,40 @@ public class SongRepository {
     }
 
     public List<Song> findAll() {
-        return em.createQuery("SELECT s FROM Song s", Song.class).getResultList();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Song> cq = cb.createQuery(Song.class);
+        Root<Song> root = cq.from(Song.class);
+        cq.select(root);
+        return em.createQuery(cq).getResultList();
     }
 
     public List<Song> findByArtist(UUID artistId) {
         if (artistId == null) return List.of();
-        return em.createQuery("SELECT s FROM Song s WHERE s.artist.id = :aid", Song.class)
-                .setParameter("aid", artistId)
-                .getResultList();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Song> cq = cb.createQuery(Song.class);
+        Root<Song> root = cq.from(Song.class);
+        cq.select(root).where(cb.equal(root.get("artist").get("id"), artistId));
+        return em.createQuery(cq).getResultList();
     }
 
     public List<Song> findByArtistAndUser(UUID artistId, UUID userId) {
         if (artistId == null || userId == null) return List.of();
-        return em.createQuery("SELECT s FROM Song s WHERE s.artist.id = :aid AND s.user.id = :uid", Song.class)
-                .setParameter("aid", artistId)
-                .setParameter("uid", userId)
-                .getResultList();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Song> cq = cb.createQuery(Song.class);
+        Root<Song> root = cq.from(Song.class);
+        Predicate p1 = cb.equal(root.get("artist").get("id"), artistId);
+        Predicate p2 = cb.equal(root.get("user").get("id"), userId);
+        cq.select(root).where(cb.and(p1, p2));
+        return em.createQuery(cq).getResultList();
     }
 
     public List<Song> findByUser(UUID userId) {
         if (userId == null) return List.of();
-        return em.createQuery("SELECT s FROM Song s WHERE s.user.id = :uid", Song.class)
-                .setParameter("uid", userId)
-                .getResultList();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Song> cq = cb.createQuery(Song.class);
+        Root<Song> root = cq.from(Song.class);
+        cq.select(root).where(cb.equal(root.get("user").get("id"), userId));
+        return em.createQuery(cq).getResultList();
     }
 
     public void create(Song song) {

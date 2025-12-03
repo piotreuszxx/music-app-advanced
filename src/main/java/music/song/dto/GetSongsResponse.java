@@ -3,6 +3,7 @@ package music.song.dto;
 import lombok.*;
 
 import java.util.List;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -25,6 +26,8 @@ public class GetSongsResponse {
         private UUID id;
         private String title;
         private UUID userId;
+        private Date createdAt;
+        private Date updatedAt;
     }
 
     @Singular

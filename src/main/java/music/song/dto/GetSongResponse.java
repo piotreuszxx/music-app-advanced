@@ -4,6 +4,7 @@ import lombok.*;
 import music.song.entity.Genre;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -20,4 +21,6 @@ public class GetSongResponse {
     private double duration;
     private UUID artistId;
     private UUID userId;
+    private Date createdAt;
+    private Date updatedAt;
 }
