@@ -49,8 +49,11 @@
                         <h:outputLabel for="filterTitle" value="#{messages['song.field.title']}" />
                         <h:inputText id="filterTitle" value="#{artistView.filterTitle}" />
 
-                        <h:outputLabel for="filterCreated" value="#{messages['song.field.createdDate']}" />
-                        <h:inputText id="filterCreated" value="#{artistView.filterCreatedString}" />
+                        <h:outputLabel for="filterGenre" value="#{messages['song.field.genre']}" />
+                        <h:selectOneMenu id="filterGenre" value="#{artistView.filterGenre}">
+                            <f:selectItem itemLabel="--" itemValue="#{null}" />
+                            <f:selectItems value="#{artistView.genres}" var="g" itemValue="#{g}" itemLabel="#{g}" />
+                        </h:selectOneMenu>
                     </h:panelGrid>
 
                     <h:commandButton value="#{messages['actions.filter']}" action="#{artistView.applyFilter}" />
@@ -58,6 +61,10 @@
                     <h:column>
                         <f:facet name="header">#{messages['song.field.title']}</f:facet>
                         #{song.title}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">#{messages['song.field.genre']}</f:facet>
+                        #{song.genre}
                     </h:column>
                     <h:column>
                         <f:facet name="header">#{messages['song.field.created']} <small>(#{messages['song.field.tz']})</small></f:facet>

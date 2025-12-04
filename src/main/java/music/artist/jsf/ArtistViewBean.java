@@ -10,6 +10,7 @@ import java.io.Serializable;
 import music.artist.dto.GetArtistResponse;
 import music.artist.service.ArtistService;
 import music.song.service.SongService;
+import music.song.entity.Genre;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,10 +36,22 @@ public class ArtistViewBean implements Serializable {
     private GetArtistResponse artist;
     private boolean notFound = false;
     private String songToDeleteId;
-    // filtering fields (title and created date)
+    // filtering fields (title and genre)
     private List<?> songs;
     private String filterTitle;
-    private String filterCreatedString; // expected format: yyyy-MM-dd
+    private Genre filterGenre;
+
+    public Genre getFilterGenre() {
+        return filterGenre;
+    }
+
+    public void setFilterGenre(Genre filterGenre) {
+        this.filterGenre = filterGenre;
+    }
+
+    public Genre[] getGenres() {
+        return Genre.values();
+    }
 
     // Explicit getters/setters for EL (avoid relying on Lombok at runtime)
     public String getFilterTitle() {
@@ -47,14 +60,6 @@ public class ArtistViewBean implements Serializable {
 
     public void setFilterTitle(String filterTitle) {
         this.filterTitle = filterTitle;
-    }
-
-    public String getFilterCreatedString() {
-        return filterCreatedString;
-    }
-
-    public void setFilterCreatedString(String filterCreatedString) {
-        this.filterCreatedString = filterCreatedString;
     }
 
     public void init() {
@@ -96,13 +101,7 @@ public class ArtistViewBean implements Serializable {
             UUID aid = UUID.fromString(id);
             music.song.dto.SongFilter filter = new music.song.dto.SongFilter();
             if (filterTitle != null && !filterTitle.isBlank()) filter.setTitle(filterTitle);
-            if (filterCreatedString != null && !filterCreatedString.isBlank()) {
-                try {
-                    filter.setCreatedDate(java.time.LocalDate.parse(filterCreatedString));
-                } catch (Exception ex) {
-                    filter.setCreatedDate(null);
-                }
-            }
+            if (filterGenre != null) filter.setGenre(filterGenre);
             List<music.song.dto.GetSongsResponse.Song> dtos = songService.findByArtistDtosWithFilter(aid, filter);
             songs = dtos;
         } catch (IllegalArgumentException e) {

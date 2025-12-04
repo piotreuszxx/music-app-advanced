@@ -1,4 +1,5 @@
 package music.song.dto;
+import music.song.entity.Genre;
 
 import lombok.*;
 
@@ -28,6 +29,7 @@ public class GetSongsResponse {
         private UUID userId;
         private Date createdAt;
         private Date updatedAt;
+        private Genre genre;
     }
 
     @Singular

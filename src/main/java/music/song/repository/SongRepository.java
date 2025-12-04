@@ -8,8 +8,10 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import music.song.dto.SongFilter;
 import music.song.entity.Song;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,32 +47,25 @@ public class SongRepository {
         return em.createQuery(cq).getResultList();
     }
 
-    /**
-     * Dynamic filtering by artist using optional title and createdDate (date-only).
-     * Both fields are optional and combined with AND. If filter is null or empty,
-     * behaves like {@link #findByArtist(UUID)}.
-     */
-    public List<Song> findByArtistWithFilter(UUID artistId, music.song.dto.SongFilter filter) {
+    // dynamic filtering by artist using optional title and genre, using AND
+    public List<Song> findByArtistWithFilter(UUID artistId, SongFilter filter) {
         if (artistId == null) return List.of();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Song> cq = cb.createQuery(Song.class);
         Root<Song> root = cq.from(Song.class);
 
         Predicate artistPred = cb.equal(root.get("artist").get("id"), artistId);
-        java.util.List<Predicate> preds = new java.util.ArrayList<>();
+        List<Predicate> preds = new ArrayList<>();
         preds.add(artistPred);
 
         if (filter != null) {
             if (filter.getTitle() != null && !filter.getTitle().isBlank()) {
                 String t = filter.getTitle().trim().toLowerCase();
-                String pattern = t + "%"; // starts-with match (anchored on the left)
+                String pattern = t + "%"; // starts with
                 preds.add(cb.like(cb.lower(root.get("title")), pattern));
             }
-            if (filter.getCreatedDate() != null) {
-                java.time.LocalDate d = filter.getCreatedDate();
-                java.time.LocalDateTime start = d.atStartOfDay();
-                java.time.LocalDateTime end = d.atTime(23,59,59,999999999);
-                preds.add(cb.between(root.get("createdAt"), start, end));
+            if (filter.getGenre() != null) {
+                preds.add(cb.equal(root.get("genre"), filter.getGenre()));
             }
         }
 

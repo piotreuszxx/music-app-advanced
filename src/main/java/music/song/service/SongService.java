@@ -112,6 +112,7 @@ public class SongService {
         GetSongsResponse.Song r = new GetSongsResponse.Song();
         r.setId(s.getId());
         r.setTitle(s.getTitle());
+        r.setGenre(s.getGenre());
         r.setUserId(s.getUser() == null ? null : s.getUser().getId());
         ZoneId displayZone = ZoneId.of("Europe/Warsaw");
         if (s.getCreatedAt() != null) r.setCreatedAt(Date.from(s.getCreatedAt().plusHours(1).atZone(displayZone).toInstant()));
