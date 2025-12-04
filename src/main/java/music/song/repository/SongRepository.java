@@ -45,6 +45,39 @@ public class SongRepository {
         return em.createQuery(cq).getResultList();
     }
 
+    /**
+     * Dynamic filtering by artist using optional title and createdDate (date-only).
+     * Both fields are optional and combined with AND. If filter is null or empty,
+     * behaves like {@link #findByArtist(UUID)}.
+     */
+    public List<Song> findByArtistWithFilter(UUID artistId, music.song.dto.SongFilter filter) {
+        if (artistId == null) return List.of();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Song> cq = cb.createQuery(Song.class);
+        Root<Song> root = cq.from(Song.class);
+
+        Predicate artistPred = cb.equal(root.get("artist").get("id"), artistId);
+        java.util.List<Predicate> preds = new java.util.ArrayList<>();
+        preds.add(artistPred);
+
+        if (filter != null) {
+            if (filter.getTitle() != null && !filter.getTitle().isBlank()) {
+                String t = filter.getTitle().trim().toLowerCase();
+                String pattern = t + "%"; // starts-with match (anchored on the left)
+                preds.add(cb.like(cb.lower(root.get("title")), pattern));
+            }
+            if (filter.getCreatedDate() != null) {
+                java.time.LocalDate d = filter.getCreatedDate();
+                java.time.LocalDateTime start = d.atStartOfDay();
+                java.time.LocalDateTime end = d.atTime(23,59,59,999999999);
+                preds.add(cb.between(root.get("createdAt"), start, end));
+            }
+        }
+
+        cq.select(root).where(cb.and(preds.toArray(new Predicate[0])));
+        return em.createQuery(cq).getResultList();
+    }
+
     public List<Song> findByArtistAndUser(UUID artistId, UUID userId) {
         if (artistId == null || userId == null) return List.of();
         CriteriaBuilder cb = em.getCriteriaBuilder();

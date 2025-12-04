@@ -8,12 +8,9 @@ import jakarta.security.enterprise.SecurityContext;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.NoArgsConstructor;
 import music.artist.entity.Artist;
+import music.song.dto.*;
 import music.song.entity.Song;
 import music.song.repository.SongRepository;
-import music.song.dto.PutSongRequest;
-import music.song.dto.PatchSongRequest;
-import music.song.dto.GetSongResponse;
-import music.song.dto.GetSongsResponse;
 import music.artist.service.ArtistService;
 import music.user.entity.Role;
 import music.user.entity.User;
@@ -74,6 +71,21 @@ public class SongService {
         }
         return songs.stream().map(this::toSmallDto).toList();
     }
+
+        @RolesAllowed({Role.ADMIN, Role.USER})
+        public List<GetSongsResponse.Song> findByArtistDtosWithFilter(UUID artistId, SongFilter filter) {
+            if (artistId == null) return List.of();
+            List<Song> songs = songRepository.findByArtistWithFilter(artistId, filter);
+            if (securityContext != null && securityContext.isCallerInRole(Role.ADMIN)) {
+                return songs.stream().map(this::toSmallDto).toList();
+            }
+            Principal principal = securityContext == null ? null : securityContext.getCallerPrincipal();
+            if (principal == null) return List.of();
+            Optional<User> userOpt = userService.findByLogin(principal.getName());
+            if (userOpt.isEmpty()) return List.of();
+            UUID userId = userOpt.get().getId();
+            return songs.stream().filter(s -> s.getUser() != null && Objects.equals(s.getUser().getId(), userId)).map(this::toSmallDto).toList();
+        }
 
     @RolesAllowed({Role.ADMIN, Role.USER})
     public Optional<GetSongResponse> findDto(UUID id) {

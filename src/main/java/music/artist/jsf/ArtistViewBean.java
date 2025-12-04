@@ -35,6 +35,27 @@ public class ArtistViewBean implements Serializable {
     private GetArtistResponse artist;
     private boolean notFound = false;
     private String songToDeleteId;
+    // filtering fields (title and created date)
+    private List<?> songs;
+    private String filterTitle;
+    private String filterCreatedString; // expected format: yyyy-MM-dd
+
+    // Explicit getters/setters for EL (avoid relying on Lombok at runtime)
+    public String getFilterTitle() {
+        return filterTitle;
+    }
+
+    public void setFilterTitle(String filterTitle) {
+        this.filterTitle = filterTitle;
+    }
+
+    public String getFilterCreatedString() {
+        return filterCreatedString;
+    }
+
+    public void setFilterCreatedString(String filterCreatedString) {
+        this.filterCreatedString = filterCreatedString;
+    }
 
     public void init() {
         if (id != null) {
@@ -43,6 +64,7 @@ public class ArtistViewBean implements Serializable {
                 Optional<GetArtistResponse> a = artistService.findDto(uuid);
                 artist = a.orElse(null);
                 notFound = (artist == null);
+                songs = null;
             } catch (IllegalArgumentException ignored) {
             }
         }
@@ -54,12 +76,38 @@ public class ArtistViewBean implements Serializable {
 
     public List<?> getSongs() {
         if (id == null) return List.of();
-            try {
-                UUID aid = UUID.fromString(id);
-                return songService.findByArtistDtos(aid);
-            } catch (IllegalArgumentException e) {
-                return List.of();
+        if (songs != null) return songs;
+        try {
+            UUID aid = UUID.fromString(id);
+            List<?> result = songService.findByArtistDtos(aid);
+            songs = result;
+            return result;
+        } catch (IllegalArgumentException e) {
+            return List.of();
+        }
+    }
+
+    public void applyFilter() {
+        if (id == null) {
+            songs = List.of();
+            return;
+        }
+        try {
+            UUID aid = UUID.fromString(id);
+            music.song.dto.SongFilter filter = new music.song.dto.SongFilter();
+            if (filterTitle != null && !filterTitle.isBlank()) filter.setTitle(filterTitle);
+            if (filterCreatedString != null && !filterCreatedString.isBlank()) {
+                try {
+                    filter.setCreatedDate(java.time.LocalDate.parse(filterCreatedString));
+                } catch (Exception ex) {
+                    filter.setCreatedDate(null);
+                }
             }
+            List<music.song.dto.GetSongsResponse.Song> dtos = songService.findByArtistDtosWithFilter(aid, filter);
+            songs = dtos;
+        } catch (IllegalArgumentException e) {
+            songs = List.of();
+        }
     }
 
 
@@ -68,12 +116,14 @@ public class ArtistViewBean implements Serializable {
         try {
             UUID sid = UUID.fromString(songToDeleteId);
             songService.deleteWithUnlink(sid);
-            // clear selection so getter will reflect removal
+            // clear selection and refresh list so getter will reflect removal
             songToDeleteId = null;
+            songs = null;
+            FacesContext.getCurrentInstance().addMessage(null, new jakarta.faces.application.FacesMessage(jakarta.faces.application.FacesMessage.SEVERITY_INFO, "Song deleted", null));
         } catch (IllegalArgumentException e) {
             // ignore invalid id
         } catch (Exception e) {
-            // deletion forbidden or failed - ignore, view will not change
+            FacesContext.getCurrentInstance().addMessage(null, new jakarta.faces.application.FacesMessage(jakarta.faces.application.FacesMessage.SEVERITY_ERROR, "Error deleting song", e.getMessage()));
         }
     }
 

@@ -44,6 +44,16 @@
             <h3>#{messages['artist.songs.header']}</h3>
                 <h:form id="songsForm">
                     <h:inputHidden id="artistId" value="#{artistView.id}" />
+
+                    <h:panelGrid columns="4" styleClass="filters">
+                        <h:outputLabel for="filterTitle" value="#{messages['song.field.title']}" />
+                        <h:inputText id="filterTitle" value="#{artistView.filterTitle}" />
+
+                        <h:outputLabel for="filterCreated" value="#{messages['song.field.createdDate']}" />
+                        <h:inputText id="filterCreated" value="#{artistView.filterCreatedString}" />
+                    </h:panelGrid>
+
+                    <h:commandButton value="#{messages['actions.filter']}" action="#{artistView.applyFilter}" />
                     <h:dataTable id="songsTable" value="#{artistView.songs}" var="song">
                     <h:column>
                         <f:facet name="header">#{messages['song.field.title']}</f:facet>
