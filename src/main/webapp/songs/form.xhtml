@@ -15,26 +15,30 @@
         <f:event type="preRenderView" listener="#{authView.checkAuth}" />
         <h2>#{messages['song.form.title']}</h2>
 
-        <h:form>
-            <h:panelGrid columns="2">
+        <h:form id="songForm">
+            <h:messages globalOnly="false" layout="table" />
+            <h:panelGrid columns="1">
                 <h:outputText value="Title:" />
-                <h:inputText value="#{songForm.song.title}" />
+                <h:inputText id="titleInput" value="#{songForm.song.title}" />
+                <h:messages for="titleInput" layout="list" showSummary="true" showDetail="false" style="color:red" />
 
                 <h:outputText value="Genre:" />
-                <h:selectOneMenu value="#{songForm.song.genre}">
+                <h:selectOneMenu id="genreInput" value="#{songForm.song.genre}">
                     <f:selectItems value="#{songForm.genres}" var="g" itemLabel="#{g}" itemValue="#{g}" />
                 </h:selectOneMenu>
 
                 <h:outputText value="Release year (YYYY-MM-DD):" />
-                <h:inputText value="#{songForm.releaseYearString}" />
+                <h:inputText id="releaseYearInput" value="#{songForm.song.releaseYear}" converter="localDateConverter" />
+                <h:messages for="releaseYearInput" layout="list" showSummary="true" showDetail="false" style="color:red" />
 
                 <h:outputText value="Duration:" />
-                <h:inputText value="#{songForm.song.duration}" />
+                <h:inputText id="durationInput" value="#{songForm.song.duration}" converter="durationConverter" />
+                <h:messages for="durationInput" layout="list" showSummary="true" showDetail="false" style="color:red" />
 
                 <h:outputText value="Artist:" />
-                    <h:selectOneMenu value="#{songForm.song.artist}" converter="artistDtoConverter">
-                        <f:selectItems value="#{songForm.artists}" var="a" itemLabel="#{a.name}" itemValue="#{a}" />
-                    </h:selectOneMenu>
+                <h:selectOneMenu id="artistInput" value="#{songForm.song.artist}" converter="artistDtoConverter">
+                    <f:selectItems value="#{songForm.artists}" var="a" itemLabel="#{a.name}" itemValue="#{a}" />
+                </h:selectOneMenu>
             </h:panelGrid>
 
             <h:commandButton value="#{messages['form.save']}" action="#{songForm.save}" />

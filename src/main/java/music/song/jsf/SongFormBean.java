@@ -4,6 +4,7 @@ import jakarta.ejb.EJB;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.application.FacesMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -91,23 +92,6 @@ public class SongFormBean implements Serializable {
 
     public Genre[] getGenres() {
         return Genre.values();
-    }
-
-    public String getReleaseYearString() {
-        if (song.getReleaseYear() == null) return "";
-        return song.getReleaseYear().toString();
-    }
-
-    public void setReleaseYearString(String s) {
-        if (s == null || s.isBlank()) {
-            song.setReleaseYear(null);
-            return;
-        }
-        try {
-            song.setReleaseYear(LocalDate.parse(s));
-        } catch (Exception e) {
-            song.setReleaseYear(null);
-        }
     }
 
     public String save() {
